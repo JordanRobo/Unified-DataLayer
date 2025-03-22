@@ -276,7 +276,7 @@ document.querySelector('#add-to-cart').addEventListener('click', () => {
 
 ```bash
 # Clone the repository
-git clone https://github.com/jordanrobo/xp-datalayer-manager.git
+git clone https://github.com/JordanRobo/xp-datalayer-manager.git
 cd xp-datalayer-manager
 
 # Install dependencies
