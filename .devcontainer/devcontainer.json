@@ -1,0 +1,37 @@
+{
+	"name": "Bun",
+	"image": "oven/bun",
+	"forwardPorts": [5173],
+	"remoteUser": "root",
+	"features": {
+		"ghcr.io/devcontainers/features/common-utils:2": {
+			"configureZshAsDefaultShell": true
+		},
+		"ghcr.io/devcontainers/features/github-cli:1": {},
+		"ghcr.io/devcontainers/features/docker-outside-of-docker:1": {
+			"moby": false,
+			"dockerDashComposeVersion": "v2"
+		}
+	},
+	"containerEnv": {},
+	"remoteEnv": {},
+	"customizations": {
+		"vscode": {
+			"extensions": ["oven.bun-vscode", "bierner.lit-html", "better-ts-errors.better-ts-errors", "ms-vscode.makefile-tools"],
+			"settings": {
+				"terminal.integrated.defaultProfile.linux": "zsh",
+				"debug.internalConsoleOptions": "neverOpen",
+				"editor.formatOnPaste": true,
+				"editor.guides.bracketPairs": "active",
+				"scm.defaultViewMode": "tree",
+				"diffEditor.diffAlgorithm": "advanced",
+				"diffEditor.experimental.showMoves": true,
+				"diffEditor.renderSideBySide": false,
+				"files.watcherExclude": {
+					"**/node_modules/**": true
+				},
+				"betterTypeScriptErrors.prettify": true
+			}
+		}
+	}
+}
