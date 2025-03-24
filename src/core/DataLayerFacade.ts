@@ -1,14 +1,14 @@
 import { pushDataLayerEvent } from "../index";
-import { cleanValue } from "./utils/cleanValue";
-import { DataLayerEvent } from "../types";
+import { cleanValue, formatProduct } from "./utils/cleanValue";
+import { Cart, DataLayerEvent, Product, ProductFilter } from "../types";
 
 /**
- * DataLayerFacade - A simplified interface for common data layer events
+ * DataLayerHelper - A simplified interface for common data layer events
  *
  * This class provides pre-configured methods for common tracking scenarios,
  * reducing boilerplate and ensuring consistency across implementations.
  */
-export class DataLayerFacade {
+export class DataLayerHelper {
 	/**
 	 * Track a home page view
 	 * @param customData - Optional additional data to include
@@ -29,12 +29,55 @@ export class DataLayerFacade {
 	}
 
 	/**
-	 * Track a product listing page view
-	 * @param listName - Optional name of the product list
-	 * @param customData - Optional additional data to include
+	 * Creates a data layer event for product listing views with formatted product data
+	 * 
+	 * This method takes an array of products, formats each one using the formatProduct function,
+	 * adds positional information, and returns a structured data layer event. It's designed to
+	 * work in both browser and server environments.
+	 * 
+	 * @param {Product[]} productsArray - Array of product objects to be formatted and tracked
+	 * @param {string} [listName] - Optional name of the product list. Defaults to the last segment of the URL path
+	 * @param {Record<string, any>} [customData={}] - Optional additional data to include in the page object
+	 * 
+	 * @returns {DataLayerEvent} A formatted data layer event object for product listing views
+	 * 
+	 * @example
+	 * // Basic usage with just products
+	 * const products = [
+	 *   {
+	 *     brand: "Nike",
+	 *     category: "Footwear",
+	 *     child_sku: "ABC123",
+	 *     color: "Black|White",
+	 *     discount: 20,
+	 *     feature: ["Lightweight", "Cushioned"],
+	 *     full_price: 120,
+	 *     gender: "Men",
+	 *     is_markdown: true,
+	 *     listed_price: "100",
+	 *     model: "Air Max",
+	 *     name: "Air Max 270",
+	 *     parent_category: "Shoes",
+	 *     parent_sku: "XYZ789",
+	 *     rating: 4.5
+	 *   }
+	 * ];
+	 * 
+	 * const event = DLManager.productListingView(products);
+	 * 
+	 * // With custom list name and additional data
+	 * const customEvent = DLManager.productListingView(
+	 *   products,
+	 *   "featured-products",
+	 *   { source: "homepage", campaign: "summer-sale" }
+	 * );
 	 */
-	static productListingView(listName?: string, customData: Record<string, any> = {}): DataLayerEvent {
+	static plpView(productsArray: Product[], listName?: string, customData: Record<string, any> = {}): DataLayerEvent {
 		const list_name = listName || (typeof window !== "undefined" ? window.location.pathname.split("/").filter(Boolean).pop() : "");
+		const products = productsArray.map((product, i) => ({
+			position: i,
+			...formatProduct(product)
+		}));
 
 		return pushDataLayerEvent("product_listing-view", {
 			default: {
@@ -48,36 +91,84 @@ export class DataLayerFacade {
 					...customData,
 				},
 			},
+			products
+		});
+	}
+
+	static plpFilter(filterData: ProductFilter ,customData: Record<string, any> = {}): DataLayerEvent {
+		return pushDataLayerEvent("product_listing-filters", {
+			default: {
+				page: {
+					type: "product",
+					action: "listing-view",
+					...customData,
+				},
+			},
+			list_filters: filterData
+		});
+	}
+
+	static plpSort(option: string, customData: Record<string, any> = {}): DataLayerEvent {
+		return pushDataLayerEvent("product_listing-sort", {
+			default: {
+				page: {
+					type: "product",
+					action: "listing-sort",
+					...customData,
+				},
+			},
+			list_sort: {
+				option
+			}
 		});
 	}
 
 	/**
 	 * Track a product detail page view
-	 * @param productData - Product information
+	 * @param {Product} productData - Product information
 	 * @param customData - Optional additional data to include
 	 */
-	static productView(
-		productData: {
-			id: string | number;
-			name: string;
-			price?: number;
-			category?: string;
-			[key: string]: any;
-		},
-		customData: Record<string, any> = {},
-	): DataLayerEvent {
+	static pdpView(productData: Product, customData: Record<string, any> = {}): DataLayerEvent {
+		const cleanProduct = formatProduct(productData);
+
 		return pushDataLayerEvent("product_view", {
 			default: {
 				page: {
 					type: "product",
-					action: "detail-view",
+					action: "view",
 					path: typeof window !== "undefined" ? window.location.pathname : "",
 					title: typeof document !== "undefined" ? cleanValue(document.title) : "",
 					url: typeof window !== "undefined" ? window.location.href : "",
 					...customData,
 				},
+			}, 
+			product: [ cleanProduct ],
+		});
+	}
+
+	static pdpColorSelect(color: string, customData: Record<string, any> = {}): DataLayerEvent {
+		return pushDataLayerEvent("product_color-select", {
+			default: {
+				page: {
+					type: "product",
+					action: "color-select",
+					...customData,
+				},
 			},
-			product: productData,
+			product: [{ color }],
+		});
+	}
+
+	static pdpSizeSelect(size: string, customData: Record<string, any> = {}): DataLayerEvent {
+		return pushDataLayerEvent("product_size-select", {
+			default: {
+				page: {
+					type: "product",
+					action: "size-select",
+					...customData,
+				},
+			},
+			product: [{ size }],
 		});
 	}
 
@@ -87,22 +178,77 @@ export class DataLayerFacade {
 	 * @param quantity - Quantity added to cart
 	 * @param customData - Optional additional data to include
 	 */
-	static addToCart(
-		productData: {
-			id: string | number;
-			name: string;
-			price?: number;
-			category?: string;
-			[key: string]: any;
-		},
-		quantity: number = 1,
-		customData: Record<string, any> = {},
-	): DataLayerEvent {
-		return pushDataLayerEvent("add_to_cart", {
-			product: {
+	static cartAdd(productData: Product[], quantity: number, customData: Record<string, any> = {}): DataLayerEvent {
+		return pushDataLayerEvent("cart_add", {
+			default: {
+				page: {
+					type: "cart",
+					action: "add",
+					name: "add-to-cart"
+				}
+			},
+			cart_items: [{
 				...productData,
 				quantity,
+			}],
+			...customData,
+		});
+	}
+
+	static cartViewMini(productData: Product[], cartData: Cart, quantity: number, customData: Record<string, any> = {}): DataLayerEvent {
+		return pushDataLayerEvent("cart_view-mini", {
+			default: {
+				page: {
+					type: "cart",
+					action: "view-mini"
+				}
 			},
+			cart: {
+				...cartData
+			},
+			cart_items: [{
+				...productData,
+				quantity,
+			}],
+			...customData,
+		});
+	}
+
+	static cartViewFull(productData: Product[], cartData: Cart, quantity: number, customData: Record<string, any> = {}): DataLayerEvent {
+		return pushDataLayerEvent("cart_view-full", {
+			default: {
+				page: {
+					type: "cart",
+					action: "view-full"
+				}
+			},
+			cart: {
+				...cartData
+			},
+			cart_items: [{
+				...productData,
+				quantity,
+			}],
+			...customData,
+		});
+	}
+
+	static cartRemove(productData: Product[], cartData: Cart, quantity: number, customData: Record<string, any> = {}): DataLayerEvent {
+		return pushDataLayerEvent("cart_remove", {
+			default: {
+				page: {
+					type: "cart",
+					action: "remove"
+				}
+			},
+			cart_item_removed: {},
+			cart: {
+				...cartData
+			},
+			cart_items: [{
+				...productData,
+				quantity,
+			}],
 			...customData,
 		});
 	}
@@ -204,4 +350,4 @@ export class DataLayerFacade {
 }
 
 // Export a convenient alias
-export const DLManager = DataLayerFacade;
+export default DataLayerHelper;

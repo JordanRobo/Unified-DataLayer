@@ -1,6 +1,6 @@
 # XP Data Layer Manager
 
-A multi-framework utility package for managing XP Data Layer events, with built-in support for React, Svelte, and Angular.
+A multi-framework utility package for managing XP Data Layer events, with built-in support for React, Svelte, and Angular (Coming Soon).
 
 ## Features
 
@@ -65,129 +65,19 @@ initializeDataLayer({
 ### React
 
 ```jsx
-// Import from the React-specific entry point
-import {
-  initializeDataLayer,
-  useHomeView,
-  useProductView,
-  useEventTracker
-} from 'xp-datalayer-manager/react';
-
-// Initialize
-initializeDataLayer();
-
-// Home Page Component
-function HomePage() {
-  // Track home page view with a hook
-  useHomeView();
-
-  return <h1>Home Page</h1>;
-}
-
-// Product Page Component
-function ProductPage({ product }) {
-  // Track product view when product changes
-  useProductView(product, {}, [product.id]);
-
-  // Track event handler
-  const trackAddToCart = useEventTracker(
-    (product, quantity = 1) => DLManager.addToCart(product, quantity)
-  );
-
-  return (
-    <div>
-      <h1>{product.name}</h1>
-      <button onClick={() => trackAddToCart(product)}>
-        Add to Cart
-      </button>
-    </div>
-  );
-}
+// Coming Soon
 ```
 
 ### Svelte
 
 ```html
-<script>
-  import {
-    initializeDataLayer,
-    SvelteDLManager,
-    trackClick,
-    trackPageView
-  } from 'xp-datalayer-manager/svelte';
-
-  import { onMount } from 'svelte';
-
-  onMount(() => {
-    initializeDataLayer();
-  });
-
-  const product = { id: '123', name: 'Example Product', price: 99.99 };
-</script>
-
-<!-- Track page view with action directive -->
-<div use:trackPageView={{ type: 'product', action: 'detail-view' }}>
-  <h1>{product.name}</h1>
-
-  <!-- Track click with action directive -->
-  <button use:trackClick={() => SvelteDLManager.addToCart(product)}>
-    Add to Cart
-  </button>
-</div>
-
-<!-- Or trigger tracking manually -->
-{SvelteDLManager.productView(product)}
+// Coming Soon
 ```
 
 ### Angular
 
 ```typescript
-// app.module.ts
-import { NgModule } from '@angular/core';
-import { DLManagerModule } from 'xp-datalayer-manager/angular';
-
-@NgModule({
-  imports: [
-    DLManagerModule
-  ]
-})
-export class AppModule { }
-
-// app.component.ts
-import { Component, OnInit } from '@angular/core';
-import {
-  DLManagerService,
-  initializeDataLayer
-} from 'xp-datalayer-manager/angular';
-
-@Component({
-  selector: 'app-root',
-  template: `
-    <!-- Track with directive -->
-    <div trackView="home">
-      <h1>Home Page</h1>
-    </div>
-
-    <!-- Track product with directive -->
-    <div *ngIf="product" [trackProduct]="product">
-      <h1>{{ product.name }}</h1>
-      <button (click)="addToCart()">Add to Cart</button>
-    </div>
-  `
-})
-export class AppComponent implements OnInit {
-  product = { id: '123', name: 'Example Product', price: 99.99 };
-
-  constructor(private dlManager: DLManagerService) {}
-
-  ngOnInit() {
-    initializeDataLayer();
-  }
-
-  addToCart() {
-    this.dlManager.manager.addToCart(this.product);
-  }
-}
+// Coming Soon
 ```
 
 ### Vanilla JavaScript
@@ -240,31 +130,6 @@ document.querySelector('#add-to-cart').addEventListener('click', () => {
 - `DLManager.formSubmit(formName, formData?, customData?)`: Track form submission
 - `DLManager.search(searchTerm, resultsCount, customData?)`: Track search
 - `DLManager.custom(eventName, eventData?)`: Track custom event
-
-### React Hooks
-
-- `useHomeView(customData?, dependencies?)`: Track home page view
-- `useProductListingView(listName?, customData?, dependencies?)`: Track product listing
-- `useProductView(productData, customData?, dependencies?)`: Track product view
-- `usePageView(pageType, action?, customData?, dependencies?)`: Track generic page view
-- `useEventTracker(trackingFunction)`: Create a tracking event handler
-
-### Svelte Utilities
-
-- `SvelteDLManager.*`: Same methods as DLManager with Svelte integration
-- `trackClick(callback)`: Svelte action for tracking clicks
-- `trackPageView(params)`: Svelte action for tracking page views
-- `trackFormSubmit(params)`: Svelte action for tracking form submissions
-- `dataLayerEvents`: Svelte store with event history
-- `currentPage`: Svelte store with current page info
-- `currentProduct`: Svelte store with current product info
-
-### Angular Utilities
-
-- `DLManagerService`: Angular service for tracking
-- `TrackViewDirective`: Angular directive for tracking page views (`trackView`)
-- `TrackProductDirective`: Angular directive for tracking product views (`trackProduct`)
-- `TrackEventDirective`: Angular directive for tracking events (`trackEvent`)
 
 ## Development
 

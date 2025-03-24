@@ -1,11 +1,11 @@
 import { DataLayerManager } from "./core/DataLayerManager";
-import { DataLayerFacade, DLManager } from "./core/DataLayerFacade";
+import { DataLayerHelper } from "./core/DataLayerFacade";
 import { DataLayerConfig, DataLayerEvent } from "./types";
 export * from "./types";
 export * from "./core/utils/cleanValue";
 
 // Export the core classes
-export { DataLayerManager, DataLayerFacade, DLManager };
+export { DataLayerManager, DataLayerHelper };
 
 // Create a singleton instance of the manager
 let dataLayerManagerInstance: DataLayerManager | null = null;
@@ -37,13 +37,6 @@ export const initializeDataLayer = (options: DataLayerConfig = {}): void => {
 	}
 };
 
-/**
- * Pushes an event to the Adobe Data Layer with properly formatted data
- *
- * @param eventName - The name of the event (e.g., 'home_view', 'product_list_view')
- * @param eventData - Object containing the event data
- * @returns The complete event object that was pushed
- */
 /**
  * Pushes an event to the Adobe Data Layer with properly formatted data
  *
