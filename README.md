@@ -1,4 +1,4 @@
-# XP Data Layer Manager
+# Unified DataLayer
 
 A multi-framework utility package for managing XP Data Layer events, with built-in support for React, Svelte, and Angular (Coming Soon).
 
@@ -16,19 +16,19 @@ A multi-framework utility package for managing XP Data Layer events, with built-
 Using Bun:
 
 ```bash
-bun add xp-datalayer-manager
+bun add unified-datalayer
 ```
 
 Using npm:
 
 ```bash
-npm install xp-datalayer-manager
+npm install unified-datalayer
 ```
 
 Using yarn:
 
 ```bash
-yarn add xp-datalayer-manager
+yarn add unified-datalayer
 ```
 
 ## Basic Setup
@@ -44,7 +44,7 @@ Include the Adobe Data Layer script in your HTML:
 Then initialize the data layer in your application:
 
 ```javascript
-import { initializeDataLayer } from 'xp-datalayer-manager';
+import { initializeDataLayer } from 'unified-datalayer';
 
 // Initialize with custom site information
 initializeDataLayer({
@@ -83,16 +83,18 @@ initializeDataLayer({
 ### Vanilla JavaScript
 
 ```javascript
-import { initializeDataLayer, DLManager } from 'xp-datalayer-manager';
+import { initializeDataLayer, DataLayer } from 'unified-datalayer';
 
 // Initialize
 initializeDataLayer();
 
+const dl = new DataLayer();
+
 // Track home page
-DLManager.homeView();
+dl.page.home();
 
 // Track product view
-DLManager.productView({
+dl.pdp.view({
   id: '123',
   name: 'Example Product',
   price: 99.99
@@ -100,7 +102,7 @@ DLManager.productView({
 
 // Add event listeners
 document.querySelector('#add-to-cart').addEventListener('click', () => {
-  DLManager.addToCart({
+  dl.cart.add({
     id: '123',
     name: 'Example Product',
     price: 99.99
@@ -120,16 +122,13 @@ document.querySelector('#add-to-cart').addEventListener('click', () => {
 
 ### DLManager Methods
 
-- `DLManager.homeView(customData?)`: Track home page view
-- `DLManager.productListingView(listName?, customData?)`: Track product listing view
-- `DLManager.productView(productData, customData?)`: Track product detail view
-- `DLManager.addToCart(productData, quantity?, customData?)`: Track add to cart
-- `DLManager.checkoutStep(step, option?, customData?)`: Track checkout step
-- `DLManager.userLogin(method, customData?)`: Track user login
-- `DLManager.pageView(pageType, action?, customData?)`: Track generic page view
-- `DLManager.formSubmit(formName, formData?, customData?)`: Track form submission
-- `DLManager.search(searchTerm, resultsCount, customData?)`: Track search
-- `DLManager.custom(eventName, eventData?)`: Track custom event
+- `DataLayer.home.view(customData?)`: Track home page view
+- `DataLayer.plp.view(listName?, customData?)`: Track product listing view
+- `DataLayer.pdp.view(productData, customData?)`: Track product detail view
+- `DataLayer.cart.add(productData, quantity?, customData?)`: Track add to cart
+- `DataLayer.checkout.step1(option?, customData?)`: Track checkout step
+- `DataLayer.account.loginStart(customData?)`: Track user login
+- `DataLayer.custom(eventName, eventData?)`: Track custom event
 
 ## Development
 

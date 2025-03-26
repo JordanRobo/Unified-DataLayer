@@ -1,5 +1,5 @@
 {
-	"name": "xp-datalayer-manager",
+	"name": "unified-datalayer",
 	"version": "1.0.0",
 	"description": "A multi-framework utility package for managing XP Data Layer events",
 	"module": "dist/index.js",

@@ -4,7 +4,7 @@ import { DataLayerEvent } from "../types";
  * DataLayerManager - A utility for managing Adobe Data Layer events
  * without requiring flush events.
  */
-export class DataLayerManager {
+class DataLayerManager {
 	private dataLayer: any[];
 	private previousEvent: any | null;
 	private propertiesToNullify: Record<string, string[]>;
@@ -98,3 +98,5 @@ export class DataLayerManager {
 		this.propertiesToNullify[key] = [...(this.propertiesToNullify[key] || []), ...properties];
 	}
 }
+
+export default DataLayerManager;

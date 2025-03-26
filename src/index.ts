@@ -1,11 +1,11 @@
-import { DataLayerManager } from "./core/DataLayerManager";
-import { DataLayerHelper } from "./core/DataLayerFacade";
+import DataLayerManager from "./core/DataLayerManager";
+import DataLayer from "./core/DataLayer";
 import { DataLayerConfig, DataLayerEvent } from "./types";
 export * from "./types";
 export * from "./core/utils/cleanValue";
 
 // Export the core classes
-export { DataLayerManager, DataLayerHelper };
+export { DataLayerManager, DataLayer };
 
 // Create a singleton instance of the manager
 let dataLayerManagerInstance: DataLayerManager | null = null;
