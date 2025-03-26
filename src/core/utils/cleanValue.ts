@@ -1,3 +1,5 @@
+// src/core/utils/cleanValue.ts
+
 import { Product } from "../../types";
 
 /**
@@ -7,11 +9,23 @@ import { Product } from "../../types";
  * @param value - The string to clean
  * @returns The cleaned string
  */
-export function cleanValue(value: string): string {
-	if (!value) return "";
+export function cleanValue(value: string | string[] | undefined | null): string {
+	// Handle null/undefined values
+	if (value === null || value === undefined) return "";
+
+	// Handle array values by joining them with commas
+	if (Array.isArray(value)) {
+		value = value.join(",");
+	}
+
+	// Convert to string in case it's a number or other type
+	const strValue = String(value);
+
+	// Return empty string for empty input
+	if (!strValue) return "";
 
 	// Convert to lowercase
-	let cleaned = value.toLowerCase();
+	let cleaned = strValue.toLowerCase();
 
 	// Trim whitespace before and after the string
 	cleaned = cleaned.trim();
@@ -27,8 +41,8 @@ export function cleanValue(value: string): string {
 
 /**
  * Takes a Product object and correctly formats it
- * 
- * @param product 
+ *
+ * @param product
  * @returns the correctly formatted Product object
  */
 

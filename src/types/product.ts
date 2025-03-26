@@ -2,7 +2,7 @@ export interface Product {
 	available_size?: string[];
 	barcode?: string;
 	brand: string;
-	category: string;
+	category: string | string[];
 	child_sku: string;
 	color: string;
 	discount: number;
