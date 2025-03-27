@@ -1,4 +1,4 @@
-import { DataLayerEvent } from "../types";
+import type { DataLayerEvent } from "../types";
 
 /**
  * DataLayerManager - A utility for managing Adobe Data Layer events

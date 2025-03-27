@@ -1,5 +1,6 @@
-import { pushDataLayerEvent, cleanValue, formatProduct } from "../..";
-import type { DataLayerEvent, Product, ProductFilter } from "../..";
+import { pushDataLayerEvent } from "../..";
+import type { DataLayerEvent, Product, ProductFilter } from "../../types";
+import { cleanValue, formatProduct } from "../utils/cleanValue"
 
 const productListingModule = {
 	/**
@@ -11,7 +12,6 @@ const productListingModule = {
 	 *
 	 * @param {Product[]} productsArray - Array of product objects to be formatted and tracked
 	 * @param {string} [listName] - Optional name of the product list. Defaults to the last segment of the URL path
-	 * @param {Record<string, any>} [customData={}] - Optional additional data to include in the page object
 	 *
 	 * @returns {DataLayerEvent} A formatted data layer event object for product listing views
 	 *
@@ -46,7 +46,7 @@ const productListingModule = {
 	 *   { source: "homepage", campaign: "summer-sale" }
 	 * );
 	 */
-	view: (productsArray: Product[], listName?: string, customData: Record<string, any> = {}): DataLayerEvent => {
+	view: (productsArray: Product[], listName?: string): DataLayerEvent => {
 		const list_name = listName || (typeof window !== "undefined" ? window.location.pathname.split("/").filter(Boolean).pop() : "");
 
 		const products = productsArray.map((product, i) => ({
@@ -63,33 +63,30 @@ const productListingModule = {
 					title: typeof document !== "undefined" ? cleanValue(document.title) : "",
 					url: typeof window !== "undefined" ? window.location.href : "",
 					list_name,
-					...customData,
 				},
 			},
 			products,
 		});
 	},
 
-	filter: (filterData: ProductFilter, customData: Record<string, any> = {}): DataLayerEvent => {
+	filter: (filterData: ProductFilter): DataLayerEvent => {
 		return pushDataLayerEvent("product_listing-filters", {
 			default: {
 				page: {
 					type: "product",
 					action: "listing-view",
-					...customData,
 				},
 			},
 			list_filters: filterData,
 		});
 	},
 
-	sort: (option: string, customData: Record<string, any> = {}): DataLayerEvent => {
+	sort: (option: string): DataLayerEvent => {
 		return pushDataLayerEvent("product_listing-sort", {
 			default: {
 				page: {
 					type: "product",
 					action: "listing-sort",
-					...customData,
 				},
 			},
 			list_sort: {

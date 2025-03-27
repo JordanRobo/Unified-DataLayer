@@ -1,5 +1,6 @@
-import { pushDataLayerEvent, cleanValue, formatProduct } from "../..";
-import type { DataLayerEvent, Product, ProductFilter } from "../..";
+import { pushDataLayerEvent } from "../..";
+import type { DataLayerEvent, Product, ProductFilter } from "../../types";
+import { cleanValue, formatProduct } from "../utils/cleanValue"
 
 const checkoutModule = {
 	/**
@@ -8,7 +9,7 @@ const checkoutModule = {
 	 * @param option - Optional checkout option (e.g., "Visa", "Home Delivery")
 	 * @param customData - Optional additional data to include
 	 */
-	step1: (step: number, option?: string, customData: Record<string, any> = {}): DataLayerEvent => {
+	step1: (step: number, option?: string): DataLayerEvent => {
 		return pushDataLayerEvent("checkout", {
 			ecommerce: {
 				checkout: {
@@ -18,7 +19,6 @@ const checkoutModule = {
 					},
 				},
 			},
-			...customData,
 		});
 	},
 };

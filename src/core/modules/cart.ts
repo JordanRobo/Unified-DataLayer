@@ -1,14 +1,14 @@
-import { pushDataLayerEvent, cleanValue, formatProduct } from "../..";
-import type { DataLayerEvent, Product, Cart, CartItem } from "../..";
+import { pushDataLayerEvent } from "../..";
+import type { DataLayerEvent, Product, Cart, CartItem } from "../../types";
+import { cleanValue, formatProduct } from "../utils/cleanValue"
 
 const cartModule = {
 	/**
 	 * Track an add to cart event
 	 * @param productData - Product information
 	 * @param quantity - Quantity added to cart
-	 * @param customData - Optional additional data to include
 	 */
-	add: (productData: CartItem, customData: Record<string, any> = {}): DataLayerEvent => {
+	add: (productData: CartItem): DataLayerEvent => {
 		let { product, quantity } = productData;
 
 		return pushDataLayerEvent("cart_add", {
@@ -25,11 +25,10 @@ const cartModule = {
 					quantity,
 				},
 			],
-			...customData,
 		});
 	},
 
-	remove: (productData: Product, cartItems: CartItem[], cartData: Cart, customData: Record<string, any> = {}): DataLayerEvent => {
+	remove: (productData: Product, cartItems: CartItem[], cartData: Cart): DataLayerEvent => {
 		const cart_items = cartItems.map((item, i) => ({
 			quantity: item.quantity,
 			...formatProduct(item.product),
@@ -49,7 +48,6 @@ const cartModule = {
 				...cartData,
 			},
 			cart_items,
-			...customData,
 		});
 	},
 
@@ -72,11 +70,10 @@ const cartModule = {
 				...cartData,
 			},
 			cart_items,
-			...customData,
 		});
 	},
 
-	viewFull: (cartItems: CartItem[], cartData: Cart, customData: Record<string, any> = {}): DataLayerEvent => {
+	viewFull: (cartItems: CartItem[], cartData: Cart): DataLayerEvent => {
 		const cart_items = cartItems.map((item, i) => ({
 			quantity: item.quantity,
 			...formatProduct(item.product),
@@ -93,7 +90,6 @@ const cartModule = {
 				...cartData,
 			},
 			cart_items,
-			...customData,
 		});
 	},
 };

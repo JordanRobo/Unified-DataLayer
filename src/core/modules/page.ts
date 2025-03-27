@@ -1,12 +1,12 @@
-import { pushDataLayerEvent, cleanValue } from "../..";
-import type { DataLayerEvent } from "../..";
+import { pushDataLayerEvent } from "../..";
+import type { DataLayerEvent } from "../../types";
+import { cleanValue } from "../utils/cleanValue"
 
 const pageModule = {
 	/**
 	 * Track a home page view
-	 * @param customData - Optional additional data to include
 	 */
-	home: (customData: Record<string, any> = {}): DataLayerEvent => {
+	home: (): DataLayerEvent => {
 		return pushDataLayerEvent("page_default", {
 			default: {
 				page: {
@@ -15,7 +15,6 @@ const pageModule = {
 					path: typeof window !== "undefined" ? window.location.pathname : "",
 					title: typeof document !== "undefined" ? cleanValue(document.title) : "",
 					url: typeof window !== "undefined" ? window.location.href : "",
-					...customData,
 				},
 			},
 		});
@@ -24,9 +23,8 @@ const pageModule = {
 	/**
 	 * Track a page view for any page type
 	 * @param pageType - Type of page (e.g., "category", "search", "checkout")
-	 * @param customData - Optional additional data to include
 	 */
-	default: (pageType: string, action: string = "view", customData: Record<string, any> = {}): DataLayerEvent => {
+	default: (pageType: string, action: string = "view"): DataLayerEvent => {
 		return pushDataLayerEvent("page_default", {
 			default: {
 				page: {
@@ -35,7 +33,6 @@ const pageModule = {
 					path: typeof window !== "undefined" ? window.location.pathname : "",
 					title: typeof document !== "undefined" ? cleanValue(document.title) : "",
 					url: typeof window !== "undefined" ? window.location.href : "",
-					...customData,
 				},
 			},
 		});

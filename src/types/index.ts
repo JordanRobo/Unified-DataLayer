@@ -1,6 +1,6 @@
-import { Loyalty, LoyaltyPoints, LoyaltyReward, LoyaltyTier, User } from "./user";
-import { Page, Site, Cart, CartItem } from "./core";
-import { Product, ProductFilter, ProductResp } from "./product";
+import type { User, Loyalty } from "./user";
+import type { Page, Site, Cart, CartItem } from "./core";
+import type { Product, ProductFilter, ProductResp } from "./product";
 
 // Declare window types for TypeScript
 declare global {
@@ -29,7 +29,7 @@ interface DataLayerEvent {
 	cart_items?: Product[];
 	checkout_type?: string;
 	products?: Product[];
-	[key: string]: any;
 }
 
-export { Cart, CartItem, DataLayerConfig, DataLayerEvent, Default, Loyalty, LoyaltyPoints, LoyaltyReward, LoyaltyTier, Page, Product, ProductFilter, ProductResp, Site, User };
+export type { DataLayerConfig, DataLayerEvent, Default };
+export type { User, Loyalty, Page, Site, Cart, Product, ProductFilter, ProductResp, CartItem };
