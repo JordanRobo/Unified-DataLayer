@@ -44,10 +44,10 @@ Include the Adobe Data Layer script in your HTML:
 Then initialize the data layer in your application:
 
 ```javascript
-import { initializeDataLayer } from 'unified-datalayer';
+import { DataLayer } from 'unified-datalayer';
 
-// Initialize with custom site information
-initializeDataLayer({
+// Initialize with required site information
+DataLayer.init({
   siteInfo: {
     name: "my-site",
     experience: "desktop",
@@ -83,12 +83,23 @@ initializeDataLayer({
 ### Vanilla JavaScript
 
 ```javascript
-import { initializeDataLayer, DataLayer } from 'unified-datalayer';
+import { DataLayer } from 'unified-datalayer';
+
+// Define the DataLayer Class (Optional for easier reuse)
+const dl = new DataLayer();
 
 // Initialize
-initializeDataLayer();
-
-const dl = new DataLayer();
+dl.init({
+  siteInfo: {
+    name: "my-site",
+    experience: "desktop",
+    currency: "USD",
+    division: "myCompany",
+    domain: window.location.host,
+    env: "prod",
+    version: "2.0.0"
+  }
+});
 
 // Track home page
 dl.page.home();
@@ -112,15 +123,7 @@ document.querySelector('#add-to-cart').addEventListener('click', () => {
 
 ## API Reference
 
-### Core Methods
-
-- `initializeDataLayer(options?)`: Initialize the data layer
-- `pushDataLayerEvent(eventName, eventData?)`: Push an event manually
-- `resetFirstEventFlag()`: Reset the first event flag
-- `getDataLayerManager()`: Get the manager instance
-- `cleanValue(value)`: Utility to format strings for the data layer
-
-### DLManager Methods
+### DataLayer Methods
 
 - `DataLayer.home.view(customData?)`: Track home page view
 - `DataLayer.plp.view(listName?, customData?)`: Track product listing view

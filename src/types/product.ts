@@ -1,4 +1,4 @@
-export interface Product {
+export interface ProductParams {
 	available_size?: string[];
 	barcode?: string;
 	brand: string;
@@ -25,7 +25,7 @@ export interface Product {
 	story?: string;
 }
 
-export interface ProductResp {
+export interface Product {
 	available_size: string[];
 	barcode: string;
 	brand: string;

@@ -1,7 +1,8 @@
-const wishlistModule = {
-	view: () => {},
-
-	add: () => {},
+export default function wishlistModule(datalayer: any) {
+	return{
+		view: () => {},
+		add: () => {},
+	}
 };
 
-export default wishlistModule;
+ wishlistModule;

@@ -1,4 +1,4 @@
-import type { Product } from "./product";
+import type { ProductParams } from "./product";
 
 export interface Site {
 	name: string;
@@ -27,6 +27,6 @@ export interface Cart {
 }
 
 export interface CartItem {
-	product: Product;
+	product: ProductParams;
 	quantity: number;
 }

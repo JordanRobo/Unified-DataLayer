@@ -1,6 +1,6 @@
 import type { User, Loyalty } from "./user";
 import type { Page, Site, Cart, CartItem } from "./core";
-import type { Product, ProductFilter, ProductResp } from "./product";
+import type { Product, ProductFilter, ProductParams } from "./product";
 
 // Declare window types for TypeScript
 declare global {
@@ -18,11 +18,10 @@ interface Default {
 }
 
 interface DataLayerConfig {
-	siteInfo?: Site;
+	siteInfo: Site;
 }
 
-interface DataLayerEvent {
-	event: string;
+interface EventParams {
 	default?: Default;
 	cart?: Cart;
 	cart_item_removed?: Product[];
@@ -31,5 +30,15 @@ interface DataLayerEvent {
 	products?: Product[];
 }
 
-export type { DataLayerConfig, DataLayerEvent, Default };
-export type { User, Loyalty, Page, Site, Cart, Product, ProductFilter, ProductResp, CartItem };
+interface DataLayerEvent extends EventParams {
+	event: string;
+	
+}
+
+interface ProductEventParams extends EventParams {
+	products: Product[]; 
+}
+
+
+export type { DataLayerConfig, EventParams, DataLayerEvent, ProductEventParams, Default };
+export type { User, Loyalty, Page, Site, Cart, Product, ProductFilter, ProductParams, CartItem };

@@ -1,4 +1,4 @@
-import type { DataLayerEvent } from "../types";
+import type { DataLayerEvent, EventParams } from "../types";
 
 /**
  * DataLayerManager - A utility for managing Adobe Data Layer events
@@ -17,9 +17,8 @@ class DataLayerManager {
 		this.dataLayer = dataLayer;
 		this.previousEvent = null;
 
-		// Track specific properties that should be nullified in nested objects
 		this.propertiesToNullify = {
-			default: ["error"], // Only nullify default.error, not other default properties
+			default: ["error"], 
 		};
 	}
 
@@ -29,28 +28,22 @@ class DataLayerManager {
 	 * @param data - The data to include in this event
 	 * @returns The complete event object that was pushed
 	 */
-	pushEvent(eventName: string, data: Record<string, any> = {}): DataLayerEvent {
-		// Create the base event object
+	dataLayerPush(eventName: string, data: EventParams = {}): DataLayerEvent {
 		const eventObj: DataLayerEvent = {
 			event: eventName,
 			...data,
 		};
 
-		// If we have a previous event, check for keys to nullify
 		if (this.previousEvent) {
-			// Handle top-level keys
 			Object.keys(this.previousEvent).forEach((key) => {
-				if (key === "event") return; // Skip event name
+				if (key === "event") return;
 
 				if (key === "default") {
-					// Special handling for default object - only nullify specific properties
 					if (typeof this.previousEvent[key] === "object" && this.previousEvent[key] !== null && !Array.isArray(this.previousEvent[key])) {
-						// Ensure the default object exists in the new event
 						if (!(key in eventObj) || typeof eventObj[key] !== "object" || eventObj[key] === null) {
 							eventObj[key] = {};
 						}
 
-						// Only nullify the specific properties in default that we care about
 						const propertiesToCheck = this.propertiesToNullify[key] || [];
 						propertiesToCheck.forEach((nestedKey) => {
 							if (
@@ -66,16 +59,13 @@ class DataLayerManager {
 						});
 					}
 				} else if (!(key in eventObj)) {
-					// For all other top-level keys, nullify if missing
 					eventObj[key] = null;
 				}
 			});
 		}
 
-		// Push to data layer
 		this.dataLayer.push(eventObj);
 
-		// Store as previous event
 		this.previousEvent = JSON.parse(JSON.stringify(eventObj));
 
 		return eventObj;

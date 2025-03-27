@@ -1,4 +1,4 @@
-import { Product, ProductResp } from "../../types";
+import { Product, ProductParams } from "../../types";
 
 /**
  * Cleans a string by converting to lowercase and replacing spaces and certain
@@ -31,9 +31,9 @@ export function cleanValue(value: string): string {
  * @param product - The input Product object
  * @returns The correctly formatted ProductResp object
  */
-export function formatProduct(product: Product): ProductResp {
+export function formatProduct(product: ProductParams): Product {
 	
-	const formattedProduct: ProductResp = {
+	const formattedProduct: Product = {
 		available_size: product.available_size || [],
 		barcode: product.barcode || "",
 		brand: cleanValue(product.brand),
