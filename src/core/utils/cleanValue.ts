@@ -1,6 +1,4 @@
-// src/core/utils/cleanValue.ts
-
-import { Product } from "../../types";
+import { Product, ProductResp } from "../../types";
 
 /**
  * Cleans a string by converting to lowercase and replacing spaces and certain
@@ -9,23 +7,11 @@ import { Product } from "../../types";
  * @param value - The string to clean
  * @returns The cleaned string
  */
-export function cleanValue(value: string | string[] | undefined | null): string {
-	// Handle null/undefined values
-	if (value === null || value === undefined) return "";
-
-	// Handle array values by joining them with commas
-	if (Array.isArray(value)) {
-		value = value.join(",");
-	}
-
-	// Convert to string in case it's a number or other type
-	const strValue = String(value);
-
-	// Return empty string for empty input
-	if (!strValue) return "";
+export function cleanValue(value: string): string {
+	if (!value) return "";
 
 	// Convert to lowercase
-	let cleaned = strValue.toLowerCase();
+	let cleaned = value.toLowerCase();
 
 	// Trim whitespace before and after the string
 	cleaned = cleaned.trim();
@@ -40,34 +26,39 @@ export function cleanValue(value: string | string[] | undefined | null): string 
 }
 
 /**
- * Takes a Product object and correctly formats it
+ * Takes a Product object and correctly formats it according to ProductResp interface
  *
- * @param product
- * @returns the correctly formatted Product object
+ * @param product - The input Product object
+ * @returns The correctly formatted ProductResp object
  */
-
-export function formatProduct(product: Product): Product {
-	const formattedProduct = { ...product };
-
-	formattedProduct.brand = cleanValue(product.brand);
-	formattedProduct.category = cleanValue(product.category);
-	formattedProduct.color = cleanValue(product.color);
-	formattedProduct.gender = cleanValue(product.gender);
-	formattedProduct.model = cleanValue(product.model);
-	formattedProduct.name = cleanValue(product.name);
-	formattedProduct.parent_category = cleanValue(product.parent_category);
-
-	if (product.speciality !== undefined) {
-		formattedProduct.speciality = cleanValue(product.speciality);
-	}
-
-	if (product.sport !== undefined) {
-		formattedProduct.sport = cleanValue(product.sport);
-	}
-
-	if (product.story !== undefined) {
-		formattedProduct.story = cleanValue(product.story);
-	}
+export function formatProduct(product: Product): ProductResp {
+	
+	const formattedProduct: ProductResp = {
+		available_size: product.available_size || [],
+		barcode: product.barcode || "",
+		brand: cleanValue(product.brand),
+		category: product.category ? product.category.map(cat => cleanValue(cat)).join(',') : "",
+		child_sku: product.child_sku,
+		color: cleanValue(product.color),
+		discount: product.discount,
+		feature: product.feature,
+		full_price: product.full_price,
+		gender: cleanValue(product.gender),
+		is_markdown: product.is_markdown,
+		listed_price: product.listed_price,
+		model: cleanValue(product.model),
+		name: cleanValue(product.name),
+		parent_category: cleanValue(product.parent_category),
+		parent_sku: product.parent_sku,
+		rating: product.rating,
+		reward_points: product.reward_points || 0,
+		size: product.size || "",
+		sku_available: product.sku_available || false,
+		sku_by_size: product.sku_by_size || "",
+		speciality: product.speciality ? cleanValue(product.speciality) : "",
+		sport: product.sport ? cleanValue(product.sport) : "",
+		story: product.story ? cleanValue(product.story) : ""
+	};
 
 	return formattedProduct;
 }

@@ -21,7 +21,7 @@ const productDisplayModule = {
 					...customData,
 				},
 			},
-			product: [cleanProduct],
+			products: [ cleanProduct ],
 		});
 	},
 
@@ -34,7 +34,7 @@ const productDisplayModule = {
 					...customData,
 				},
 			},
-			product: [{ color }],
+			products: [{ color }],
 		});
 	},
 
@@ -47,7 +47,7 @@ const productDisplayModule = {
 					...customData,
 				},
 			},
-			product: [{ size }],
+			products: [{ size }],
 		});
 	},
 };

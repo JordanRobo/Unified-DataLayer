@@ -1,6 +1,6 @@
 import { pushDataLayerEvent } from "../index";
 import type { DataLayerEvent } from "../types";
-import { CartModule, CheckoutModule, PageModule, ProductDisplayModule, ProductListingModule, WishlistModule } from "./modules";
+import { AccountModule, CartModule, CheckoutModule, PageModule, ProductDisplayModule, ProductListingModule, WishlistModule } from "./modules";
 
 /**
  * DataLayer - A simplified interface for common data layer events
@@ -15,6 +15,7 @@ class DataLayer {
 	static plp = ProductListingModule;
 	static checkout = CheckoutModule;
 	static wishlist = WishlistModule;
+	static account = AccountModule;
 
 	/**
 	 * Track a custom event
