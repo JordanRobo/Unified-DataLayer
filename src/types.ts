@@ -1,4 +1,28 @@
-export interface ProductParams {
+declare global {
+	interface Window {
+		adobeDataLayer: any[];
+	}
+}
+
+export interface DataLayerConfig {
+	siteInfo: Site;
+}
+
+export interface EventData {
+	[key: string]: any;
+}
+
+export interface Site {
+	name: string;
+	experience: string;
+	currency: string;
+	division: string;
+	domain: string;
+	env: string;
+	version: string;
+}
+
+export interface ProductData {
 	available_size?: string[];
 	barcode?: string;
 	brand: string;
@@ -50,9 +74,4 @@ export interface Product {
 	speciality: string;
 	sport: string;
 	story: string;
-}
-
-export interface ProductFilter {
-	filter_type: string;
-	filter_value: string;
 }
