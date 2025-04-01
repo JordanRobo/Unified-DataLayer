@@ -3,9 +3,14 @@ import { ProductData } from "../types";
 
 export interface ProductListingMod {
 	view(productsArray: ProductData[], listName?: string): void;
-	filter(): void;
-	sort(): void;
+	filter(list_filters: ListFilters): void;
+	sort(option: string): void;
 	click(): void;
+}
+
+interface ListFilters {
+	filter_type: string;
+	filter_value: string;
 }
 
 export class ProductListingImpl extends BaseModule implements ProductListingMod {
@@ -24,13 +29,36 @@ export class ProductListingImpl extends BaseModule implements ProductListingMod 
 					action: "listing-view",
 					list_name,
 				},
+				products
 			},
 		});
 	}
 
-	filter(): void {}
+	filter(list_filters: ListFilters): void {
+		this.pushEvent("product_listing-filters", {
+			default: {
+				page: {
+					type: "product",
+					action: "listing-filters"
+				}
+			},
+			list_filters
+		})
+	}
 
-	sort(): void {}
+	sort(option: string): void {
+		this.pushEvent("product_listing-sort", {
+			default: {
+				page: {
+					type: "product",
+					action: "listing-sort"
+				}
+			},
+			list_sort: {
+				option
+			}
+		})
+	}
 
 	click(): void {}
 }

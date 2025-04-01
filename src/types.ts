@@ -47,6 +47,7 @@ export interface ProductData {
 	speciality?: string;
 	sport?: string;
 	story?: string;
+	[key: string]: any;
 }
 
 export interface Product {

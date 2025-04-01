@@ -12,7 +12,10 @@ export interface ProductDisplayMod {
 
 export class ProductDisplayImpl extends BaseModule implements ProductDisplayMod {
 	view(productData: ProductData): void {
-		const formattedProduct = this.formatProduct(productData);
+		const products = new Array();
+		products.push(this.formatProduct(productData));
+
+	
 
 		this.pushEvent("product_view", {
 			default: {
@@ -24,7 +27,7 @@ export class ProductDisplayImpl extends BaseModule implements ProductDisplayMod 
 					url: typeof window !== "undefined" ? window.location.href : "",
 				},
 			},
-			products: [formattedProduct],
+			products,
 		});
 	}
 
@@ -40,5 +43,15 @@ export class ProductDisplayImpl extends BaseModule implements ProductDisplayMod 
 		});
 	}
 
-	sizeSelect(size: string): void {}
+	sizeSelect(size: string): void {
+		this.pushEvent("product_size_select", {
+			default: {
+				page: {
+					type: "product",
+					action: "size-select"
+				}
+			},
+			products: [{ size }]
+		})
+	}
 }
