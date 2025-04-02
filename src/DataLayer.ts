@@ -126,17 +126,6 @@ class DataLayer {
 							}
 						});
 					}
-				} else if (Array.isArray(this.previousEvent[key])) {
-					if (!(key in eventObj)) {
-						eventObj[key] = null;
-					}
-
-					if (Array.isArray(eventObj[key]) &&
-						this.previousEvent[key].length > eventObj[key].length) {
-						for (let i = eventObj[key].length; i < this.previousEvent[key].length; i++) {
-							eventObj[key][i] = null;
-						}
-					}
 				} else if (!(key in eventObj)) {
 					eventObj[key] = null;
 				}

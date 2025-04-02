@@ -63,12 +63,15 @@ export class CartImpl extends BaseModule implements CartMod {
 	 * @param {CartInput} cartInput - Either the 'quoteId' or 'cartId' for the Cart object
 	 */
 	remove(removed: ProductData, items: CartItems[], cartInput: CartInput): void {
-		const cart_item_removed = [this.formatProduct(removed)];
+		const cart_item_removed = this.formatProduct(removed);
 
-		const cart_items = items.map(({ qty, ...productData }) => ({
-			...this.formatProduct(productData),
-			qty
-		}));
+		const cart_items = [
+			...items.map(({ qty, ...productData }) => ({
+				...this.formatProduct(productData),
+				qty
+			})),
+			null
+		];
 
 		const cart: Cart = {
 			cartId: cartInput.cartId || '',
