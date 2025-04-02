@@ -3,8 +3,7 @@
 A multi-framework utility package for managing XP Data Layer events across different platforms, with a focus on Adobe Analytics integration.
 
 [![npm version](https://img.shields.io/npm/v/unified-datalayer.svg)](https://www.npmjs.com/package/unified-datalayer)
-[![license](https://img.shields.io/npm/l/unified-datalayer.svg)](https://github.com/yourusername/unified-datalayer/blob/main/LICENSE)
-
+[![license](https://img.shields.io/npm/l/unified-datalayer.svg)](https://github.com/JordanRobo/Unified-DataLayer/blob/main/LICENSE)
 ## Overview
 
 Unified DataLayer provides a standardised way to interact with Adobe's Data Layer across different web frameworks. It offers module-based architecture for various tracking scenarios like page views, product displays, cart interactions, and more.

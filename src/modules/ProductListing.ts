@@ -29,8 +29,8 @@ export class ProductListingImpl extends BaseModule implements ProductListingMod 
 					action: "listing-view",
 					list_name,
 				},
-				products
 			},
+			products,
 		});
 	}
 

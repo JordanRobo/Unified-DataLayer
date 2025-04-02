@@ -128,7 +128,7 @@ class DataLayer {
 					}
 				} else if (Array.isArray(this.previousEvent[key])) {
 					if (!(key in eventObj)) {
-						eventObj[key] = [];
+						eventObj[key] = null;
 					}
 
 					if (Array.isArray(eventObj[key]) &&
