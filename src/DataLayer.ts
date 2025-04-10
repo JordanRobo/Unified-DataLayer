@@ -62,8 +62,22 @@ class DataLayer {
 
 	/**
 	 * Initialise the DataLayer with configuration options
-	 * @param options Configuration options including required site information
+	 * @param {DataLayerConfig} options Configuration options including required site information
 	 * @throws Error if siteInfo is not provided
+	 * @example 
+	 * const dl = getDataLayer();
+	 * 
+	 * dl.init({
+	 * 	siteInfo: {
+	 * 		name: "my-site",
+	 * 		experience: "desktop",
+	 * 		currency: "AUD",
+	 * 		division: "myCompany",
+	 * 		domain: "www.my-site.com.au",
+	 * 		env: "prod",
+	 * 		version: "4.2.0"
+	 * 	}
+	 * });
 	 */
 	public init(options: DataLayerConfig): void {
 		if (!options.siteInfo) {
@@ -80,61 +94,136 @@ class DataLayer {
 	 * @throws Error if DataLayer has not been initialized with siteInfo
 	 */
 	public pushEvent(eventName: string, eventData: EventData = {}): void {
-		if (this.isFirstEventAfterRefresh && (!this.config || !this.config.siteInfo)) {
-			throw new Error("DataLayer not initialized: Call DataLayer.init({siteInfo: {...}}) before pushing events");
-		}
+		// Validate initialisation
+		this.validateInitialisation();
 
+		// Skip actual push in server-side rendering
 		if (typeof window === "undefined") {
 			console.log(`Event would be pushed: ${eventName}`, eventData);
 			return;
 		}
 
+		// Prepare event object
+		const eventObj = this.prepareEventObject(eventName, eventData);
+
+		// Apply nullification logic for tracking state changes
+		this.applyNullificationLogic(eventObj);
+
+		// Push to data layer
+		this.dataLayer.push(eventObj);
+
+		// Store clean version of the event for future reference
+		this.storeCleanPreviousEvent(eventObj);
+	}
+
+	/**
+	 * Validates that the DataLayer is properly initialised
+	 * @private
+	 */
+	private validateInitialisation(): void {
+		if (this.isFirstEventAfterRefresh && (!this.config || !this.config.siteInfo)) {
+			throw new Error("DataLayer not initialized: Call DataLayer.init({siteInfo: {...}}) before pushing events");
+		}
+	}
+
+	/**
+	 * Prepares the event object with all necessary data
+	 * @private
+	 */
+	private prepareEventObject(eventName: string, eventData: EventData): any {
 		const dataToSend = { ...eventData };
 
+		// Add site info on first event after page load
 		if (this.isFirstEventAfterRefresh && this.config) {
 			dataToSend.default = dataToSend.default || {};
 			dataToSend.default.site = this.config.siteInfo;
 			this.isFirstEventAfterRefresh = false;
 		}
 
-		const eventObj: any = {
+		return {
 			event: eventName,
 			...dataToSend,
 		};
+	}
 
-		if (this.previousEvent) {
-			Object.keys(this.previousEvent).forEach((key) => {
-				if (key === "event") return;
+	/**
+	 * Applies nullification logic to track state changes between events
+	 * @private
+	 */
+	private applyNullificationLogic(eventObj: any): void {
+		if (!this.previousEvent) return;
 
-				if (key === "default") {
-					if (typeof this.previousEvent[key] === "object" && this.previousEvent[key] !== null && !Array.isArray(this.previousEvent[key])) {
-						if (!(key in eventObj) || typeof eventObj[key] !== "object" || eventObj[key] === null) {
-							eventObj[key] = {};
-						}
+		Object.keys(this.previousEvent).forEach((key) => {
+			if (key === "event") return;
 
-						const propertiesToCheck = this.propertiesToNullify[key] || [];
-						propertiesToCheck.forEach((nestedKey) => {
-							if (
-								typeof eventObj[key] === "object" &&
-								eventObj[key] !== null &&
-								nestedKey in this.previousEvent[key] &&
-								typeof this.previousEvent[key] === "object" &&
-								this.previousEvent[key] !== null &&
-								!(nestedKey in (eventObj[key] as Record<string, any>))
-							) {
-								(eventObj[key] as Record<string, any>)[nestedKey] = null;
-							}
-						});
-					}
-				} else if (!(key in eventObj)) {
-					eventObj[key] = null;
+			if (key === "default") {
+				this.handleDefaultObjectNullification(eventObj, key);
+			} else if (!(key in eventObj)) {
+				// Nullify top-level keys that aren't in the current event
+				eventObj[key] = null;
+			}
+		});
+	}
+
+	/**
+	 * Handles nullification for nested properties in the 'default' object
+	 * @private
+	 */
+	private handleDefaultObjectNullification(eventObj: any, key: string): void {
+		const prevValue = this.previousEvent?.[key];
+
+		// Skip if not an object or is null/array
+		if (typeof prevValue !== "object" || prevValue === null || Array.isArray(prevValue)) {
+			return;
+		}
+
+		// Create default object if it doesn't exist
+		if (!(key in eventObj) || typeof eventObj[key] !== "object" || eventObj[key] === null) {
+			eventObj[key] = {};
+		}
+
+		// Get properties that should be nullified for this key
+		const propertiesToCheck = this.propertiesToNullify[key] || [];
+
+		// Nullify each property if needed
+		propertiesToCheck.forEach((nestedKey) => {
+			const shouldNullify =
+				typeof eventObj[key] === "object" &&
+				eventObj[key] !== null &&
+				nestedKey in prevValue &&
+				!(nestedKey in eventObj[key]);
+
+			if (shouldNullify) {
+				eventObj[key][nestedKey] = null;
+			}
+		});
+	}
+
+	/**
+	 * Stores a clean version of the event as previousEvent by removing nullified properties
+	 * @private
+	 */
+	private storeCleanPreviousEvent(eventObj: any): void {
+		// Create a deep copy of the event
+		const cleanEvent = JSON.parse(JSON.stringify(eventObj));
+
+		// Remove all top-level null properties except 'default'
+		Object.keys(cleanEvent).forEach(key => {
+			if (key !== "default" && cleanEvent[key] === null) {
+				delete cleanEvent[key];
+			}
+		});
+
+		// Clean up nullified properties in the 'default' object
+		if (cleanEvent.default && typeof cleanEvent.default === "object") {
+			Object.keys(cleanEvent.default).forEach(nestedKey => {
+				if (cleanEvent.default[nestedKey] === null) {
+					delete cleanEvent.default[nestedKey];
 				}
 			});
 		}
 
-		this.dataLayer.push(eventObj);
-
-		this.previousEvent = JSON.parse(JSON.stringify(eventObj));
+		this.previousEvent = cleanEvent;
 	}
 
 	/**
@@ -147,7 +236,7 @@ class DataLayer {
 
 	/**
 	 * Configure properties that should be automatically nullified
-	 * @param properties Map of object keys to arrays of properties to nullify
+	 * @param properties - Map of object keys to arrays of properties to nullify
 	 */
 	public setPropertiesToNullify(properties: Record<string, string[]>): void {
 		this.propertiesToNullify = properties;
@@ -155,8 +244,8 @@ class DataLayer {
 
 	/**
 	 * Add properties to nullify for a specific object key
-	 * @param key The object key (e.g., 'default')
-	 * @param properties Array of property names to nullify
+	 * @param key - The object key (e.g., 'default')
+	 * @param properties - Array of property names to nullify
 	 */
 	public addPropertiesToNullify(key: string, properties: string[]): void {
 		this.propertiesToNullify[key] = [...(this.propertiesToNullify[key] || []), ...properties];

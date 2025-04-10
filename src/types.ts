@@ -4,22 +4,39 @@ declare global {
 	}
 }
 
+/**
+ * Configuration options for initialising the DataLayer
+ */
 export interface DataLayerConfig {
-	siteInfo: Site;
+	/**
+	 * Required site information details
+	 */
+	siteInfo: {
+		/** Name of the site */
+		name: string;
+
+		/** Experience type (e.g., "desktop", "mobile") */
+		experience: string;
+
+		/** Currency code (e.g., "AUD", "USD") */
+		currency: string;
+
+		/** Company division */
+		division: string;
+
+		/** Site domain */
+		domain: string;
+
+		/** Environment (e.g., "dev", "prod") */
+		env: string;
+
+		/** Site version */
+		version: string;
+	};
 }
 
 export interface EventData {
 	[key: string]: any;
-}
-
-export interface Site {
-	name: string;
-	experience: string;
-	currency: string;
-	division: string;
-	domain: string;
-	env: string;
-	version: string;
 }
 
 export interface ProductData {
