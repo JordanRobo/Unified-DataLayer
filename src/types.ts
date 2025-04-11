@@ -18,7 +18,7 @@ export interface DataLayerConfig {
 		/** Experience type (e.g., "desktop", "mobile") */
 		experience: string;
 
-		/** Currency code (e.g., "AUD", "USD") */
+		/** Currency code (e.g., "AUD", "NZD") */
 		currency: string;
 
 		/** Company division */

@@ -11,6 +11,10 @@ export interface ProductDisplayMod {
 }
 
 export class ProductDisplayImpl extends BaseModule implements ProductDisplayMod {
+	/**
+	 * 
+	 * @param productData 
+	 */
 	view(productData: ProductData): void {
 		const product = this.formatProduct(productData);
 
