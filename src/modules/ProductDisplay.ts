@@ -32,6 +32,10 @@ export class ProductDisplayImpl extends BaseModule implements ProductDisplayMod 
 		});
 	}
 
+	/**
+	 * 
+	 * @param color 
+	 */
 	colorSelect(color: string): void {
 		this.pushEvent("product_color-select", {
 			default: {
@@ -44,6 +48,10 @@ export class ProductDisplayImpl extends BaseModule implements ProductDisplayMod 
 		});
 	}
 
+	/**
+	 * 
+	 * @param size 
+	 */
 	sizeSelect(size: string): void {
 		this.pushEvent("product_size_select", {
 			default: {

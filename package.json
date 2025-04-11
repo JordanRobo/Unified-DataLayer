@@ -18,7 +18,6 @@
 	"scripts": {
 		"build": "bun build ./src/index.ts --outdir ./dist --target browser --minify",
 		"build:types": "tsc --emitDeclarationOnly",
-		"dev": "bun --watch src/index.ts",
 		"test": "bun test",
 		"prepare": "bun run build && bun run build:types"
 	},

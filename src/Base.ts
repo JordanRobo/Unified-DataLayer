@@ -1,5 +1,5 @@
 import DataLayer from "./DataLayer";
-import { Product, ProductData, EventData } from "./types";
+import { Product, ProductData, EventData, Cart_Product, CartProductData } from "./types";
 
 /**
  * BaseModule provides shared functionality for all data layer modules
@@ -46,32 +46,64 @@ export abstract class BaseModule {
 	 */
 	protected formatProduct(product: ProductData): Product {
 		const formattedProduct: Product = {
-			available_size: product.available_size || [],
-			barcode: product.barcode || "",
 			brand: this.formatString(product.brand),
 			category: product.category ? product.category.map((cat) => this.formatString(cat)).join(",") : "",
 			child_sku: product.child_sku,
 			color: this.formatString(product.color),
 			discount: product.discount,
-			feature: product.feature,
+			feature: product.feature || [],
 			full_price: product.full_price,
 			gender: this.formatString(product.gender),
 			is_markdown: product.is_markdown,
 			listed_price: product.listed_price,
-			model: this.formatString(product.model),
 			name: this.formatString(product.name),
 			parent_category: this.formatString(product.parent_category),
 			parent_sku: product.parent_sku,
-			rating: product.rating,
-			reward_points: product.reward_points || 0,
-			size: product.size || "",
 			sku_available: product.sku_available || false,
-			sku_by_size: product.sku_by_size || "",
-			speciality: product.speciality ? this.formatString(product.speciality) : "",
-			sport: product.sport ? this.formatString(product.sport) : "",
-			story: product.story ? this.formatString(product.story) : "",
 		};
 
+		if (product.available_size) formattedProduct.available_size = product.available_size;
+		if (product.barcode) formattedProduct.barcode = product.barcode;
+		if (product.rating) formattedProduct.rating = product.rating;
+		if (product.reward_points) formattedProduct.reward_points = product.reward_points;
+		if (product.model) formattedProduct.model = this.formatString(product.model);
+		if (product.speciality) formattedProduct.speciality = this.formatString(product.speciality);
+		if (product.sport) formattedProduct.sport = this.formatString(product.sport);
+		if (product.story) formattedProduct.story = this.formatString(product.story);
+
 		return formattedProduct;
+	}
+
+	protected formatCartItem(product: CartProductData): Cart_Product {
+		const formattedItem: Cart_Product = {
+			brand: this.formatString(product.brand),
+			category: product.category ? product.category.map((cat) => this.formatString(cat)).join(",") : "",
+			child_sku: product.child_sku,
+			color: this.formatString(product.color),
+			discount: product.discount,
+			feature: product.feature || [],
+			full_price: product.full_price,
+			gender: this.formatString(product.gender),
+			is_markdown: product.is_markdown,
+			listed_price: product.listed_price,
+			name: this.formatString(product.name),
+			parent_category: this.formatString(product.parent_category),
+			parent_sku: product.parent_sku,
+			sku_available: product.sku_available || false,
+			size: product.size,
+			sku_by_size: product.sku_by_size,
+			qty: product.qty,
+		};
+
+		if (product.available_size) formattedItem.available_size = product.available_size;
+		if (product.barcode) formattedItem.barcode = product.barcode;
+		if (product.rating) formattedItem.rating = product.rating;
+		if (product.reward_points) formattedItem.reward_points = product.reward_points;
+		if (product.model) formattedItem.model = this.formatString(product.model);
+		if (product.speciality) formattedItem.speciality = this.formatString(product.speciality);
+		if (product.sport) formattedItem.sport = this.formatString(product.sport);
+		if (product.story) formattedItem.story = this.formatString(product.story);
+
+		return formattedItem;
 	}
 }

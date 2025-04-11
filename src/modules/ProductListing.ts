@@ -1,5 +1,5 @@
 import { BaseModule } from "../Base";
-import { ProductData } from "../types";
+import { ProductData, BaseProduct } from "../types";
 
 export interface ProductListingMod {
 	view(productsArray: ProductData[], listName?: string): void;
@@ -40,6 +40,10 @@ interface ListFilters {
 	filter_value: string;
 }
 
+interface PLP_Product extends BaseProduct {
+	position: number;
+}
+
 export class ProductListingImpl extends BaseModule implements ProductListingMod {
 	/**
 	 * Push a 'product_listing-view' event to the datalayer
@@ -76,7 +80,7 @@ export class ProductListingImpl extends BaseModule implements ProductListingMod 
 	view(productsArray: ProductData[], listName?: string): void {
 		const list_name = listName || (typeof window !== "undefined" ? window.location.pathname.split("/").filter(Boolean).pop() : "");
 
-		const products = productsArray.map((product, i) => ({
+		const products: PLP_Product[] = productsArray.map((product, i) => ({
 			position: i,
 			...this.formatProduct(product),
 		}));

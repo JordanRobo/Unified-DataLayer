@@ -1,12 +1,12 @@
 import { BaseModule } from "../Base";
-import { ProductData } from "../types";
+import { ProductData, Cart_Product, CartProductData } from "../types";
 
 export interface CartMod {
 	add(product: ProductData): void;
-	remove(removed: ProductData, cart_items: CartItems[], cartInput: CartInput): void;
-	update(items: CartItems[], cartInput: CartInput): void;
-	miniView(items: CartItems[], cartInput: CartInput): void;
-	fullView(items: CartItems[], cartInput: CartInput): void;
+	remove(removed: CartProductData, cart_items: CartProductData[], cartInput: CartInput): void;
+	update(items: CartProductData[], cartInput: CartInput): void;
+	miniView(items: CartProductData[], cartInput: CartInput): void;
+	fullView(items: CartProductData[], cartInput: CartInput): void;
 }
 
 interface Cart {
@@ -20,13 +20,10 @@ type CartInput =
 	| { cartId: string; quoteId?: string; }
 	| { cartId?: string; quoteId: string; };
 
-interface CartItems extends ProductData {
-	qty: number;
-}
 
 export class CartImpl extends BaseModule implements CartMod {
 
-	private calculateCart(items: CartItems[]): { cart_quantity: string, cart_total: string } {
+	private calculateCart(items: CartProductData[]): { cart_quantity: string, cart_total: string } {
 		const totalQuantity = items.reduce((total, item) => total + (item.qty || 0), 0);
 		const totalPrice = items.reduce((total, item) =>
 			total + ((item.listed_price || 0) * (item.qty || 0)), 0);
@@ -37,12 +34,8 @@ export class CartImpl extends BaseModule implements CartMod {
 		};
 	}
 
-	/**
-	 * push a 'cart-add' event to the xpDataLayer
-	 * @param {ProductData} product - Data of the product that is being added to cart
-	 */
-	add(product: ProductData): void {
-		const cart_items = [this.formatProduct(product)];
+	add(product: CartProductData): void {
+		const cart_items: Cart_Product[] = [this.formatCartItem(product)];
 
 		this.pushEvent("cart_add", {
 			default: {
@@ -56,19 +49,12 @@ export class CartImpl extends BaseModule implements CartMod {
 		})
 	}
 
-	/**
-	 * push a 'cart_remove' event to the xpDataLayer
-	 * @param {ProductData} removed - Product object containing data of the item that was removed
-	 * @param {CartItems[]} items - Array of Product objects that still remain in the cart
-	 * @param {CartInput} cartInput - Either the 'quoteId' or 'cartId' for the Cart object
-	 */
-	remove(removed: ProductData, items: CartItems[], cartInput: CartInput): void {
-		const cart_item_removed = this.formatProduct(removed);
+	remove(removed: CartProductData, items: CartProductData[], cartInput: CartInput): void {
+		const cart_item_removed: Cart_Product = this.formatCartItem(removed);
 
 		const cart_items = [
-			...items.map(({ qty, ...productData }) => ({
-				...this.formatProduct(productData),
-				qty
+			...items.map(({ ...product }) => ({
+				...this.formatCartItem(product)
 			})),
 			null
 		];
@@ -94,12 +80,7 @@ export class CartImpl extends BaseModule implements CartMod {
 
 	}
 
-	/**
-	 * push a 'cart_update' event to the xpDataLayer
-	 * @param items 
-	 * @param cartInput 
-	 */
-	update(items: CartItems[], cartInput: CartInput): void {
+	update(items: CartProductData[], cartInput: CartInput): void {
 		const cart_items = items.map(({ qty, ...productData }) => ({
 			...this.formatProduct(productData),
 			qty
@@ -124,12 +105,7 @@ export class CartImpl extends BaseModule implements CartMod {
 		})
 	}
 
-	/**
-	 * push a 'cart_view-mini' event to the xpDataLayer
-	 * @param items 
-	 * @param cartInput 
-	 */
-	miniView(items: CartItems[], cartInput: CartInput): void {
+	miniView(items: CartProductData[], cartInput: CartInput): void {
 		const cart_items = items.map(({ qty, ...productData }) => ({
 			...this.formatProduct(productData),
 			qty
@@ -154,12 +130,7 @@ export class CartImpl extends BaseModule implements CartMod {
 		})
 	}
 
-	/**
-	 * push a 'cart_view-full' event to the xpDataLayer
-	 * @param items 
-	 * @param cartInput 
-	 */
-	fullView(items: CartItems[], cartInput: CartInput): void {
+	fullView(items: CartProductData[], cartInput: CartInput): void {
 		const cart_items = items.map(({ qty, ...productData }) => ({
 			...this.formatProduct(productData),
 			qty
