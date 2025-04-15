@@ -1,5 +1,10 @@
 # Based on https://raw.githubusercontent.com/github/gitignore/main/Node.gitignore
 
+!example/
+example/node_modules/
+example/.svelte-kit/
+example/build/
+
 # Logs
 
 logs

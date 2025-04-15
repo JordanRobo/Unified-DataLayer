@@ -1,12 +1,15 @@
 import { BaseModule } from "../Base";
-import { ProductData, Cart_Product, CartProductData } from "../types";
+import { ProductData, CartProductData } from "../types";
 
 export interface CartMod {
 	add(product: ProductData): void;
-	remove(removed: CartProductData, cart_items: CartProductData[], cartInput: CartInput): void;
-	update(items: CartProductData[], cartInput: CartInput): void;
+	remove(childSku: string): void;
+	update(childSku: string, quantity: number): void;
 	miniView(items: CartProductData[], cartInput: CartInput): void;
 	fullView(items: CartProductData[], cartInput: CartInput): void;
+
+	getCartItems(): CartProductData[];
+	getCartInfo(): Cart;
 }
 
 interface Cart {
@@ -20,8 +23,15 @@ type CartInput =
 	| { cartId: string; quoteId?: string; }
 	| { cartId?: string; quoteId: string; };
 
-
 export class CartImpl extends BaseModule implements CartMod {
+	// Internal state
+	private cartItems: CartProductData[] = [];
+	private cartInfo: Cart = {
+		cartId: '',
+		quoteId: '',
+		cart_quantity: '0',
+		cart_total: '0.00'
+	};
 
 	private calculateCart(items: CartProductData[]): { cart_quantity: string, cart_total: string } {
 		const totalQuantity = items.reduce((total, item) => total + (item.qty || 0), 0);
@@ -35,8 +45,28 @@ export class CartImpl extends BaseModule implements CartMod {
 	}
 
 	add(product: CartProductData): void {
-		const cart_items: Cart_Product[] = [this.formatCartItem(product)];
+		// Format the product for data layer
+		const cartItem = this.formatCartItem(product);
 
+		// Add to internal state (if it already exists, we'd handle that logic)
+		const existingItemIndex = this.cartItems.findIndex(item => item.child_sku === product.child_sku);
+
+		if (existingItemIndex !== -1) {
+			// Update quantity if item exists
+			this.cartItems[existingItemIndex].qty = (this.cartItems[existingItemIndex].qty || 0) + (product.qty || 1);
+		} else {
+			// Add new item
+			this.cartItems.push(product);
+		}
+
+		// Update cart calculations
+		const cartCalculations = this.calculateCart(this.cartItems);
+		this.cartInfo = {
+			...this.cartInfo,
+			...cartCalculations
+		};
+
+		// Push event
 		this.pushEvent("cart_add", {
 			default: {
 				page: {
@@ -45,26 +75,40 @@ export class CartImpl extends BaseModule implements CartMod {
 					name: "add-to-cart"
 				}
 			},
-			cart_items
-		})
+			cart_items: [cartItem]
+		});
 	}
 
-	remove(removed: CartProductData, items: CartProductData[], cartInput: CartInput): void {
-		const cart_item_removed: Cart_Product = this.formatCartItem(removed);
+	remove(childSku: string): void {
+		// Find the item to remove
+		const itemIndex = this.cartItems.findIndex(item => item.child_sku === childSku);
 
+		if (itemIndex === -1) {
+			console.warn(`Item with SKU ${childSku} not found in cart`);
+			return;
+		}
+
+		// Get a copy of the removed item before removing it
+		const removedItem = { ...this.cartItems[itemIndex] };
+
+		// Remove the item from the internal state
+		this.cartItems.splice(itemIndex, 1);
+
+		// Update cart calculations
+		const cartCalculations = this.calculateCart(this.cartItems);
+		this.cartInfo = {
+			...this.cartInfo,
+			...cartCalculations
+		};
+
+		// Format items for the event
+		const cart_item_removed = this.formatCartItem(removedItem);
 		const cart_items = [
-			...items.map(({ ...product }) => ({
-				...this.formatCartItem(product)
-			})),
+			...this.cartItems.map(product => this.formatCartItem(product)),
 			null
 		];
 
-		const cart: Cart = {
-			cartId: cartInput.cartId || '',
-			quoteId: cartInput.quoteId || '',
-			...this.calculateCart(items)
-		};
-
+		// Push event
 		this.pushEvent("cart_remove", {
 			default: {
 				page: {
@@ -75,23 +119,33 @@ export class CartImpl extends BaseModule implements CartMod {
 			},
 			cart_item_removed,
 			cart_items,
-			cart
-		})
-
+			cart: this.cartInfo
+		});
 	}
 
-	update(items: CartProductData[], cartInput: CartInput): void {
-		const cart_items = items.map(({ qty, ...productData }) => ({
-			...this.formatProduct(productData),
-			qty
-		}));
+	update(childSku: string, quantity: number): void {
+		// Find the item to update
+		const itemIndex = this.cartItems.findIndex(item => item.child_sku === childSku);
 
-		const cart: Cart = {
-			cartId: cartInput.cartId || '',
-			quoteId: cartInput.quoteId || '',
-			...this.calculateCart(items)
+		if (itemIndex === -1) {
+			console.warn(`Item with SKU ${childSku} not found in cart`);
+			return;
+		}
+
+		// Update the quantity
+		this.cartItems[itemIndex].qty = quantity;
+
+		// Update cart calculations
+		const cartCalculations = this.calculateCart(this.cartItems);
+		this.cartInfo = {
+			...this.cartInfo,
+			...cartCalculations
 		};
 
+		// Format items for the event
+		const cart_items = this.cartItems.map(product => this.formatCartItem(product));
+
+		// Push event
 		this.pushEvent("cart_update", {
 			default: {
 				page: {
@@ -101,22 +155,18 @@ export class CartImpl extends BaseModule implements CartMod {
 				}
 			},
 			cart_items,
-			cart
-		})
+			cart: this.cartInfo
+		});
 	}
 
 	miniView(items: CartProductData[], cartInput: CartInput): void {
-		const cart_items = items.map(({ qty, ...productData }) => ({
-			...this.formatProduct(productData),
-			qty
-		}));
+		// Update internal state with the provided data
+		this.syncCartState(items, cartInput);
 
-		const cart: Cart = {
-			cartId: cartInput.cartId || '',
-			quoteId: cartInput.quoteId || '',
-			...this.calculateCart(items)
-		};
+		// Format items for the event
+		const cart_items = this.cartItems.map(product => this.formatCartItem(product));
 
+		// Push event
 		this.pushEvent("cart_view-mini", {
 			default: {
 				page: {
@@ -126,22 +176,18 @@ export class CartImpl extends BaseModule implements CartMod {
 				}
 			},
 			cart_items,
-			cart
-		})
+			cart: this.cartInfo
+		});
 	}
 
 	fullView(items: CartProductData[], cartInput: CartInput): void {
-		const cart_items = items.map(({ qty, ...productData }) => ({
-			...this.formatProduct(productData),
-			qty
-		}));
+		// Update internal state with the provided data
+		this.syncCartState(items, cartInput);
 
-		const cart: Cart = {
-			cartId: cartInput.cartId || '',
-			quoteId: cartInput.quoteId || '',
-			...this.calculateCart(items)
-		};
+		// Format items for the event
+		const cart_items = this.cartItems.map(product => this.formatCartItem(product));
 
+		// Push event
 		this.pushEvent("cart_view-full", {
 			default: {
 				page: {
@@ -150,7 +196,29 @@ export class CartImpl extends BaseModule implements CartMod {
 				}
 			},
 			cart_items,
-			cart
-		})
+			cart: this.cartInfo
+		});
+	}
+
+	// Helper method to sync the cart state
+	private syncCartState(items: CartProductData[], cartInput: CartInput): void {
+		// Update cart items
+		this.cartItems = [...items];
+
+		// Update cart info
+		this.cartInfo = {
+			cartId: cartInput.cartId || '',
+			quoteId: cartInput.quoteId || '',
+			...this.calculateCart(items)
+		};
+	}
+
+	// Public methods to access cart state
+	getCartItems(): CartProductData[] {
+		return [...this.cartItems];
+	}
+
+	getCartInfo(): Cart {
+		return { ...this.cartInfo };
 	}
 }
