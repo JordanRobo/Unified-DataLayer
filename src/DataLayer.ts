@@ -81,7 +81,7 @@ class DataLayer {
 	 */
 	public init(options: DataLayerConfig): void {
 		if (!options.siteInfo) {
-			throw new Error("DataLayer initialization failed: siteInfo is required");
+			throw new Error("DataLayer initialisation failed: siteInfo is required");
 		}
 
 		this.config = options;
@@ -91,7 +91,7 @@ class DataLayer {
 	 * Pushes an event to the Adobe Data Layer with properly formatted data
 	 * @param eventName The name of the event
 	 * @param eventData Object containing the event data
-	 * @throws Error if DataLayer has not been initialized with siteInfo
+	 * @throws Error if DataLayer has not been initialised with siteInfo
 	 */
 	public pushEvent(eventName: string, eventData: EventData = {}): void {
 		// Validate initialisation

@@ -44,10 +44,8 @@ export interface ProductData {
 	category: string[];
 	child_sku: string;
 	color: string;
-	discount: number;
 	full_price: number;
 	gender: string;
-	is_markdown: boolean;
 	listed_price: number;
 	name: string;
 	parent_category: string;

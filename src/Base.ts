@@ -32,7 +32,7 @@ export abstract class BaseModule {
 
 		let cleaned = input.toLowerCase();
 		cleaned = cleaned.trim();
-		cleaned = cleaned.replace(/\|/g, "-");
+		cleaned = cleaned.replace(/\|/g, " ");
 		cleaned = cleaned.replace(/\s+/g, "-");
 
 		return cleaned;
@@ -50,11 +50,11 @@ export abstract class BaseModule {
 			category: product.category ? product.category.map((cat) => this.formatString(cat)).join(",") : "",
 			child_sku: product.child_sku,
 			color: this.formatString(product.color),
-			discount: product.discount,
+			discount: Number((((product.full_price - product.listed_price) / product.full_price) * 100).toFixed(2)),
 			feature: product.feature || [],
 			full_price: product.full_price,
 			gender: this.formatString(product.gender),
-			is_markdown: product.is_markdown,
+			is_markdown: product.full_price !== product.listed_price,
 			listed_price: product.listed_price,
 			name: this.formatString(product.name),
 			parent_category: this.formatString(product.parent_category),
@@ -80,11 +80,11 @@ export abstract class BaseModule {
 			category: product.category ? product.category.map((cat) => this.formatString(cat)).join(",") : "",
 			child_sku: product.child_sku,
 			color: this.formatString(product.color),
-			discount: product.discount,
+			discount: Number((((product.full_price - product.listed_price) / product.full_price) * 100).toFixed(2)),
 			feature: product.feature || [],
 			full_price: product.full_price,
 			gender: this.formatString(product.gender),
-			is_markdown: product.is_markdown,
+			is_markdown: product.full_price !== product.listed_price,
 			listed_price: product.listed_price,
 			name: this.formatString(product.name),
 			parent_category: this.formatString(product.parent_category),
