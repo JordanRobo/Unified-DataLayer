@@ -3,7 +3,9 @@
 	import { onDestroy } from 'svelte';
 	import { cartItemsStore, emptyCart, removeFromCart, type CartItem } from '$lib/stores';
 	import QuantityInput from '$lib/components/QuantityInput.svelte';
+	import { getDataLayer } from 'unified-datalayer';
 
+	const dl = getDataLayer();
 	export let cartOpened: boolean;
 	let backgroundNode: HTMLElement;
 
@@ -28,7 +30,6 @@
 
 	async function handlePayment() {
 		emptyCart();
-		alert("Order has been placed");
 	}
 
 	onDestroy(unsubscribe);
@@ -75,9 +76,9 @@
 					<div>
 						<a href="/products/{cartItem.slug}" target="_self">{cartItem.name}</a>
 						<div class="flex gap-3 my-2">
-							<QuantityInput bind:count={cartItem.quantity} mini={true} />
+							<QuantityInput bind:count={cartItem.quantity} bind:childSku={cartItem.child_sku} mini={true} />
 							<button
-								on:click={() => removeFromCart(cartItem.slug)}
+								on:click={() => (removeFromCart(cartItem.slug), dl.cart.remove(cartItem.child_sku))}
 								class="font-light hover:underline"
 							>
 								Remove

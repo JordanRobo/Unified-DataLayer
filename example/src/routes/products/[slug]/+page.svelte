@@ -6,20 +6,30 @@
 	import ProductItem from '$lib/components/ProductItem.svelte';
 	import { afterNavigate } from '$app/navigation';
 	import { getDataLayer } from 'unified-datalayer';
+	import type { CartProductData, ProductData } from 'unified-datalayer/dist/types';
 
 	const dl = getDataLayer();
 
 	export let data: any;
 	let original_data = data;
-	let product = data;
 	let quantity = 1;
 	let selected_size: any = null;
 	let available_sizes = ["US 9", "US 10", "US 11", "US 12"];
 
-	product = {
-		child_sku: product.sku,
-		...product
-	}
+	let product: ProductData = {
+		brand: data.brand,
+		category: [],
+		child_sku: data.sku,
+		color: data.color,
+		full_price: data.price,
+		gender: data.gender,
+		listed_price: data.sale_price !== 0 ? data.sale_price : data.price,
+		name: data.name,
+		parent_category: data.parent_category,
+		parent_sku: data.parent_sku,
+		sku_available: data.in_stock,
+		...data
+	};
 
 	$: {
 		if (original_data !== data) {
@@ -35,36 +45,32 @@
 		dl.pdp.sizeSelect(selected_size);	
 	}
 
-	function prepareToCart() {
-		if (!selected_size) {
-        	alert("Please select a size first");
-        	return;
-    	};
-
-		let item: CartItem;
-
-		let cart_item = {
-			qty: quantity,
+	function sendToDataLayer() {
+		let cart_item: CartProductData = {
+			qty: 1,
+			sku_by_size: `${product.child_sku}_${selected_size}`,
 			size: selected_size,
-			sku_by_size: `${product.sku}_${selected_size}`,
 			...product
 		};
 
-		item = {
+		dl.cart.add(cart_item);
+	}
+
+	function prepareToCart() {
+		let item: CartItem = {
 			id: product.id,
-			name: product.name,
 			slug: product.slug,
 			thumbnail: `${product.images[0]}?thumb=100x100`,
 			price: product.price,
 			salePrice: product.sale_price,
 			quantity: quantity,
-			...cart_item
+			sku_by_size: `${product.child_sku}_${selected_size}`,
+			size: selected_size,
+			...product
 		};
 
-		
-		dl.cart.add(cart_item);
 		addToCart(item);
-		alert("Item added to cart");
+		sendToDataLayer();
 	}
 
 	afterNavigate(() => {

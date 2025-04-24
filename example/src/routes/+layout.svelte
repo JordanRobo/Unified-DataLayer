@@ -8,13 +8,13 @@
 
 	dl.init({
 		siteInfo: {
-			name: "my-site",
+			name: "DataLayer Example",
 	 		experience: "desktop",
 	  		currency: "AUD",
-	  		division: "myCompany",
+	  		division: "DLE",
 	  		domain: "www.my-site.com.au",
 	  		env: "prod",
-	  		version: "4.2.0"
+	  		version: "1.0.0"
 	 	}
 	});
 

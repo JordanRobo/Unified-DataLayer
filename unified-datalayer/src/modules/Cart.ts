@@ -1,8 +1,8 @@
 import { BaseModule } from "../Base";
-import { ProductData, CartProductData } from "../types";
+import { CartProductData } from "../types";
 
 export interface CartMod {
-	add(product: ProductData): void;
+	add(product: CartProductData): void;
 	remove(childSku: string): void;
 	update(childSku: string, quantity: number): void;
 	miniView(items: CartProductData[], cartInput: CartInput): void;

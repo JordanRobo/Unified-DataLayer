@@ -1,13 +1,20 @@
 <script lang="ts">
+	import { getDataLayer } from "unified-datalayer";
+
+	const dl = getDataLayer();
+
 	export let count = 1;
 	export let mini = false;
+	export let childSku = '';
 	let previousCount = count;
 
 	function handleClick(amount: number) {
 		count += amount;
 		if (count < 1) {
 			count = 1;
+			return;
 		}
+		dl.cart.update(childSku, count);
 	}
 
 	function validator(node: any, value: any) {

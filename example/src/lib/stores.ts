@@ -55,4 +55,5 @@ export interface CartItem {
 	salePrice: number;
 	thumbnail: string;
 	quantity: number;
+	[key: string]: any;
 }

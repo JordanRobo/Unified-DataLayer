@@ -1,4 +1,4 @@
-<script>
+<script lang='ts'>
 	import Cart from '$lib/components/Cart.svelte';
 	import { cartItemsStore } from '$lib/stores';
 	import { getDataLayer } from 'unified-datalayer';
@@ -8,18 +8,34 @@
 	let cartOpened = false;
 
 	let cartId = crypto.randomUUID();
-	let items = $cartItemsStore;
+
+	function mapCartProducts(products: any[]) {
+		return products.map(item => ({
+			brand: item.brand,
+			category: [],
+			child_sku: item.sku,
+			color: item.color,
+			full_price: item.price,
+			gender: item.gender,
+			listed_price: item.sale_price !== 0 ? item.sale_price : item.price,
+			name: item.name,
+			parent_category: item.parent_category,
+			parent_sku: item.parent_sku,
+			sku_available: item.in_stock,
+			qty: item.quantity,
+			size: item.size,
+			sku_by_size: item.sku_by_size
+		}))
+	}
 
 	function openCart() {
 		cartOpened = !cartOpened;
 
-		console.log(items)
-		if (cartOpened){
-			dl.cart.miniView(items, {cartId});
+		if(cartOpened){
+			const cartItems = mapCartProducts($cartItemsStore);
+      		dl.cart.miniView(cartItems, {cartId});
 		}
 	}
-
-	
 </script>
 
 <nav class="sticky top-0 z-10 bg-[#282828] text-white">

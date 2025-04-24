@@ -6,15 +6,29 @@
 
 	const dl = getDataLayer();
 
-	const handleProductListView = () => {
-		dl.plp.view(products);
-	};
-
 	export let data: any;
 	$: products = data.items;
 
+	function mapProducts(products: any[]) {
+		return products.map(item => ({
+			brand: item.brand,
+			category: [],
+			child_sku: item.sku,
+			color: item.color,
+			full_price: item.price,
+			gender: item.gender,
+			listed_price: item.sale_price !== 0 ? item.sale_price : item.price,
+			name: item.name,
+			parent_category: item.parent_category,
+			parent_sku: item.parent_sku,
+			sku_available: item.in_stock,
+			...item
+		}))
+	}
+
 	afterNavigate(() => {
-		handleProductListView();
+		const items = mapProducts(products)
+		dl.plp.view(items);
 	});
 </script>
 
