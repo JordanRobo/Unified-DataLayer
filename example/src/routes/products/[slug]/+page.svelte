@@ -33,10 +33,11 @@
 
 	$: {
 		if (original_data !== data) {
-			product = data;
+			product = { brand: data.brand, category: [], child_sku: data.sku, color: data.color, full_price: data.price, gender: data.gender, listed_price: data.sale_price !== 0 ? data.sale_price : data.price, name: data.name, parent_category: data.parent_category, parent_sku: data.parent_sku, sku_available: data.in_stock, ...data };
 			product.images = product.images;
 			quantity = 1;
 			original_data = data;
+			selected_size = null;
 		}
 	}
 

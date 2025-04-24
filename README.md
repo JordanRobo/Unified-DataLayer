@@ -31,7 +31,7 @@ bun add unified-datalayer
 
 ## Basic Usage
 
-### Initialization
+### Initialisation
 
 Initialise the data layer with your site information:
 

@@ -5,7 +5,7 @@ import { PageMod, PageImpl } from "./modules/Page";
 import { ProductDisplayMod, ProductDisplayImpl } from "./modules/ProductDisplay";
 import { ProductListingImpl, ProductListingMod } from "./modules/ProductListing";
 import { WishlistImpl, WishlistMod } from "./modules/Wishlist";
-import type { DataLayerConfig, EventData } from "./types";
+import type { DataLayerConfig, EventData, UserInfo } from "./types";
 
 /**
  * DataLayer - A unified interface for managing data layer events
@@ -16,6 +16,7 @@ import type { DataLayerConfig, EventData } from "./types";
 class DataLayer {
 	private static instance: DataLayer | null = null;
 	private config: DataLayerConfig | null = null;
+	private user: UserInfo | null = null;
 	private isFirstEventAfterRefresh = true;
 	private dataLayer: any[] = [];
 	private previousEvent: any | null = null;
@@ -85,6 +86,16 @@ class DataLayer {
 		}
 
 		this.config = options;
+		
+		if (typeof window !== "undefined") {
+			this.user = {
+				user_state: window.localStorage.getItem("uem_hashed") ? "customer" : "guest",
+				login_state: window.localStorage.getItem("uem_hashed") ? "logged-in" : "anonymous",
+				uem_hashed: window.localStorage.getItem("uem_hashed") ?? "",
+				session_id: "",
+				division_id: ""
+			};
+		}
 	}
 
 	/**
@@ -116,13 +127,17 @@ class DataLayer {
 		this.storeCleanPreviousEvent(eventObj);
 	}
 
+	public clearProducts(): void {
+		this.dataLayer.push({products: null})
+	}
+
 	/**
 	 * Validates that the DataLayer is properly initialised
 	 * @private
 	 */
 	private validateInitialisation(): void {
 		if (this.isFirstEventAfterRefresh && (!this.config || !this.config.siteInfo)) {
-			throw new Error("DataLayer not initialized: Call DataLayer.init({siteInfo: {...}}) before pushing events");
+			throw new Error("DataLayer not initialised: Call DataLayer.init({siteInfo: {...}}) before pushing events");
 		}
 	}
 
@@ -137,6 +152,9 @@ class DataLayer {
 		if (this.isFirstEventAfterRefresh && this.config) {
 			dataToSend.default = dataToSend.default || {};
 			dataToSend.default.site = this.config.siteInfo;
+			if (this.user) {
+				dataToSend.default.user = this.user;
+			}
 			this.isFirstEventAfterRefresh = false;
 		}
 

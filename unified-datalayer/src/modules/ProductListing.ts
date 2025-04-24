@@ -85,6 +85,7 @@ export class ProductListingImpl extends BaseModule implements ProductListingMod 
 			...this.formatProduct(product),
 		}));
 
+		this.clearProducts();
 		this.pushEvent("product_listing-view", {
 			default: {
 				page: {

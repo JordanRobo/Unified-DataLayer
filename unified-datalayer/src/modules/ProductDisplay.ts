@@ -16,8 +16,9 @@ export class ProductDisplayImpl extends BaseModule implements ProductDisplayMod 
 	 * @param productData 
 	 */
 	view(productData: ProductData): void {
-		const product = this.formatProduct(productData);
+		const products = [this.formatProduct(productData)];
 
+		this.clearProducts();
 		this.pushEvent("product_view", {
 			default: {
 				page: {
@@ -28,7 +29,7 @@ export class ProductDisplayImpl extends BaseModule implements ProductDisplayMod 
 					url: typeof window !== "undefined" ? window.location.href : "",
 				},
 			},
-			product,
+			products,
 		});
 	}
 
@@ -44,7 +45,7 @@ export class ProductDisplayImpl extends BaseModule implements ProductDisplayMod 
 					action: "color-select",
 				},
 			},
-			product: { color },
+			products: [{ color }],
 		});
 	}
 
@@ -60,7 +61,7 @@ export class ProductDisplayImpl extends BaseModule implements ProductDisplayMod 
 					action: "size-select"
 				}
 			},
-			product: { size }
+			products: [{ size }]
 		})
 	}
 }

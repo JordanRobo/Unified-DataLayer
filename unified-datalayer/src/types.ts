@@ -4,6 +4,14 @@ declare global {
 	}
 }
 
+export interface UserInfo {
+	user_state: string;
+	login_state: string;
+	uem_hashed: string;
+	session_id: string;
+	division_id: string;
+}
+
 /**
  * Configuration options for initialising the DataLayer
  */

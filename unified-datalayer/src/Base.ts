@@ -17,7 +17,11 @@ export abstract class BaseModule {
 	 * @param eventData The data to include with the event
 	 */
 	protected pushEvent(eventName: string, eventData: EventData = {}): void {
-		return this.dataLayer.pushEvent(eventName, eventData);
+		this.dataLayer.pushEvent(eventName, eventData);
+	}
+
+	protected clearProducts(): void {
+		this.dataLayer.clearProducts();
 	}
 
 	/**
