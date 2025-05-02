@@ -45,28 +45,23 @@ export class CartImpl extends BaseModule implements CartMod {
 	}
 
 	add(product: CartProductData): void {
-		// Format the product for data layer
-		const cartItem = this.formatCartItem(product);
+		this.validateCartProductData(product);
 
-		// Add to internal state (if it already exists, we'd handle that logic)
+		const cartItem = this.formatCartItem(product);
 		const existingItemIndex = this.cartItems.findIndex(item => item.child_sku === product.child_sku);
 
 		if (existingItemIndex !== -1) {
-			// Update quantity if item exists
 			this.cartItems[existingItemIndex].qty = (this.cartItems[existingItemIndex].qty || 0) + (product.qty || 1);
 		} else {
-			// Add new item
 			this.cartItems.push(product);
 		}
 
-		// Update cart calculations
 		const cartCalculations = this.calculateCart(this.cartItems);
 		this.cartInfo = {
 			...this.cartInfo,
 			...cartCalculations
 		};
 
-		// Push event
 		this.pushEvent("cart_add", {
 			default: {
 				page: {
@@ -80,7 +75,8 @@ export class CartImpl extends BaseModule implements CartMod {
 	}
 
 	remove(childSku: string): void {
-		// Find the item to remove
+		this.validateString(childSku, 'childSku');
+
 		const itemIndex = this.cartItems.findIndex(item => item.child_sku === childSku);
 
 		if (itemIndex === -1) {
@@ -88,27 +84,22 @@ export class CartImpl extends BaseModule implements CartMod {
 			return;
 		}
 
-		// Get a copy of the removed item before removing it
 		const removedItem = { ...this.cartItems[itemIndex] };
 
-		// Remove the item from the internal state
 		this.cartItems.splice(itemIndex, 1);
 
-		// Update cart calculations
 		const cartCalculations = this.calculateCart(this.cartItems);
 		this.cartInfo = {
 			...this.cartInfo,
 			...cartCalculations
 		};
 
-		// Format items for the event
 		const cart_item_removed = this.formatCartItem(removedItem);
 		const cart_items = [
 			...this.cartItems.map(product => this.formatCartItem(product)),
 			null
 		];
 
-		// Push event
 		this.pushEvent("cart_remove", {
 			default: {
 				page: {
@@ -124,7 +115,19 @@ export class CartImpl extends BaseModule implements CartMod {
 	}
 
 	update(childSku: string, quantity: number): void {
-		// Find the item to update
+		this.validateMultiple([
+			{
+				value: childSku,
+				paramName: 'childSku',
+				type: "string"
+			},
+			{
+				value: quantity,
+				paramName: 'quantity',
+				type: "number"
+			}
+		]);
+
 		const itemIndex = this.cartItems.findIndex(item => item.child_sku === childSku);
 
 		if (itemIndex === -1) {
@@ -132,20 +135,16 @@ export class CartImpl extends BaseModule implements CartMod {
 			return;
 		}
 
-		// Update the quantity
 		this.cartItems[itemIndex].qty = quantity;
 
-		// Update cart calculations
 		const cartCalculations = this.calculateCart(this.cartItems);
 		this.cartInfo = {
 			...this.cartInfo,
 			...cartCalculations
 		};
 
-		// Format items for the event
 		const cart_items = this.cartItems.map(product => this.formatCartItem(product));
 
-		// Push event
 		this.pushEvent("cart_update", {
 			default: {
 				page: {
@@ -160,13 +159,10 @@ export class CartImpl extends BaseModule implements CartMod {
 	}
 
 	miniView(items: CartProductData[], cartInput: CartInput): void {
-		// Update internal state with the provided data
 		this.syncCartState(items, cartInput);
 
-		// Format items for the event
 		const cart_items = this.cartItems.map(product => this.formatCartItem(product));
 
-		// Push event
 		this.pushEvent("cart_view-mini", {
 			default: {
 				page: {
@@ -181,13 +177,10 @@ export class CartImpl extends BaseModule implements CartMod {
 	}
 
 	fullView(items: CartProductData[], cartInput: CartInput): void {
-		// Update internal state with the provided data
 		this.syncCartState(items, cartInput);
 
-		// Format items for the event
 		const cart_items = this.cartItems.map(product => this.formatCartItem(product));
 
-		// Push event
 		this.pushEvent("cart_view-full", {
 			default: {
 				page: {
@@ -202,10 +195,8 @@ export class CartImpl extends BaseModule implements CartMod {
 
 	// Helper method to sync the cart state
 	private syncCartState(items: CartProductData[], cartInput: CartInput): void {
-		// Update cart items
 		this.cartItems = [...items];
 
-		// Update cart info
 		this.cartInfo = {
 			cartId: cartInput.cartId || '',
 			quoteId: cartInput.quoteId || '',
@@ -213,7 +204,6 @@ export class CartImpl extends BaseModule implements CartMod {
 		};
 	}
 
-	// Public methods to access cart state
 	getCartItems(): CartProductData[] {
 		return [...this.cartItems];
 	}

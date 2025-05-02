@@ -110,4 +110,196 @@ export abstract class BaseModule {
 
 		return formattedItem;
 	}
+
+	/**
+	* Validates that a string parameter meets requirements
+	*/
+	protected validateString(value: any, paramName: string, options: {
+		required?: boolean;
+		allowEmpty?: boolean;
+		minLength?: number;
+		maxLength?: number;
+		pattern?: RegExp;
+	} = {}): void {
+		const {
+			required = true,
+			allowEmpty = false,
+			minLength,
+			maxLength,
+			pattern
+		} = options;
+
+		if (required && (value === undefined || value === null)) {
+			throw new Error(`${paramName} is required.`);
+		}
+
+		if (typeof value !== 'string') {
+			throw new Error(`${paramName} must be a string.`);
+		}
+
+		if (!allowEmpty && value.trim().length === 0) {
+			throw new Error(`${paramName} cannot be empty or whitespace.`);
+		}
+
+		if (minLength !== undefined && value.length < minLength) {
+			throw new Error(`${paramName} must be at least ${minLength} characters long.`);
+		}
+
+		if (maxLength !== undefined && value.length > maxLength) {
+			throw new Error(`${paramName} cannot exceed ${maxLength} characters.`);
+		}
+
+		if (pattern && !pattern.test(value)) {
+			throw new Error(`${paramName} format is invalid.`);
+		}
+	}
+
+	/**
+	 * Validates that a number parameter meets requirements
+	 */
+	protected validateNumber(value: any, paramName: string, options: {
+		required?: boolean;
+		integer?: boolean;
+		min?: number;
+		max?: number;
+		positive?: boolean;
+	} = {}): void {
+		const {
+			required = true,
+			integer = false,
+			min,
+			max,
+			positive = false
+		} = options;
+
+		if (required && (value === undefined || value === null)) {
+			throw new Error(`${paramName} is required.`);
+		}
+
+		if (typeof value !== 'number') {
+			throw new Error(`${paramName} must be a number.`);
+		}
+
+		if (isNaN(value)) {
+			throw new Error(`${paramName} must be a valid number.`);
+		}
+
+		if (integer && !Number.isInteger(value)) {
+			throw new Error(`${paramName} must be an integer.`);
+		}
+
+		if (positive && value < 0) {
+			throw new Error(`${paramName} must be positive.`);
+		}
+
+		if (min !== undefined && value < min) {
+			throw new Error(`${paramName} must be at least ${min}.`);
+		}
+
+		if (max !== undefined && value > max) {
+			throw new Error(`${paramName} cannot exceed ${max}.`);
+		}
+	}
+
+	/**
+	 * Validates multiple arguments at once
+	 */
+	protected validateMultiple(validations: Array<{
+		value: any;
+		paramName: string;
+		type: 'string' | 'number';
+		options?: any;
+	}>): void {
+		for (const validation of validations) {
+			if (validation.type === 'string') {
+				this.validateString(validation.value, validation.paramName, validation.options);
+			} else if (validation.type === 'number') {
+				this.validateNumber(validation.value, validation.paramName, validation.options);
+			}
+		}
+	}
+
+	/**
+	 * Validates that input is of type ProductData
+	 * @param data 
+	 * @param paramName 
+	 */
+	protected validateProductData(data: any, paramName: string = 'productData'): asserts data is ProductData {
+		if (!data || typeof data !== 'object') {
+			throw new Error(`${paramName} must be an object.`);
+		}
+
+		// Validate required fields
+		try {
+			this.validateString(data.brand, 'brand');
+			this.validateString(data.child_sku, 'child_sku');
+			this.validateString(data.color, 'color');
+			this.validateString(data.gender, 'gender');
+			this.validateString(data.name, 'name');
+			this.validateString(data.parent_category, 'parent_category');
+			this.validateString(data.parent_sku, 'parent_sku');
+
+			this.validateNumber(data.full_price, 'full_price', { positive: true });
+			this.validateNumber(data.listed_price, 'listed_price', { positive: true });
+
+			if (!Array.isArray(data.category)) {
+				throw new Error('category must be an array');
+			}
+			// Validate each category is a string
+			data.category.forEach((cat: any, index: number) => {
+				this.validateString(cat, `category[${index}]`);
+			});
+
+			if (typeof data.sku_available !== 'boolean') {
+				throw new Error('sku_available must be a boolean');
+			}
+		} catch (error) {
+			// @ts-ignore
+			throw new Error(`${paramName} validation failed: ${error.message}`);
+		}
+	}
+
+	/**
+	 * Validates that input is of type ProductData
+	 * @param data 
+	 * @param paramName 
+	 */
+	protected validateCartProductData(data: any, paramName: string = 'cartProductData'): asserts data is CartProductData {
+		if (!data || typeof data !== 'object') {
+			throw new Error(`${paramName} must be an object.`);
+		}
+
+		// Validate required fields
+		try {
+			this.validateString(data.brand, 'brand');
+			this.validateString(data.child_sku, 'child_sku');
+			this.validateString(data.color, 'color');
+			this.validateString(data.gender, 'gender');
+			this.validateString(data.name, 'name');
+			this.validateString(data.parent_category, 'parent_category');
+			this.validateString(data.parent_sku, 'parent_sku');
+			this.validateString(data.sku_by_size, 'sku_by_size');
+			this.validateString(data.size, 'size');
+
+			this.validateNumber(data.full_price, 'full_price', { positive: true });
+			this.validateNumber(data.listed_price, 'listed_price', { positive: true });
+			this.validateNumber(data.qty, 'qty', { positive: true });
+
+			if (!Array.isArray(data.category)) {
+				throw new Error('category must be an array');
+			}
+			// Validate each category is a string
+			data.category.forEach((cat: any, index: number) => {
+				this.validateString(cat, `category[${index}]`);
+			});
+
+			if (typeof data.sku_available !== 'boolean') {
+				throw new Error('sku_available must be a boolean');
+			}
+		} catch (error) {
+			// @ts-ignore
+			throw new Error(`${paramName} validation failed: ${error.message}`);
+		}
+	}
+
 }

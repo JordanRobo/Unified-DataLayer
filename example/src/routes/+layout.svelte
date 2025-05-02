@@ -6,7 +6,7 @@
 
 	const dl = getDataLayer();
 
-	dl.init({
+	let info = {
 		siteInfo: {
 			name: "DataLayer Example",
 	 		experience: "desktop",
@@ -16,7 +16,9 @@
 	  		env: "prod",
 	  		version: "1.0.0"
 	 	}
-	});
+	}
+
+	dl.init(info);
 
 </script>
 

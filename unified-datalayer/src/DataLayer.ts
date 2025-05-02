@@ -105,25 +105,17 @@ class DataLayer {
 	 * @throws Error if DataLayer has not been initialised with siteInfo
 	 */
 	public pushEvent(eventName: string, eventData: EventData = {}): void {
-		// Validate initialisation
 		this.validateInitialisation();
 
-		// Skip actual push in server-side rendering
 		if (typeof window === "undefined") {
 			console.log(`Event would be pushed: ${eventName}`, eventData);
 			return;
 		}
 
-		// Prepare event object
 		const eventObj = this.prepareEventObject(eventName, eventData);
 
-		// Apply nullification logic for tracking state changes
 		this.applyNullificationLogic(eventObj);
-
-		// Push to data layer
 		this.dataLayer.push(eventObj);
-
-		// Store clean version of the event for future reference
 		this.storeCleanPreviousEvent(eventObj);
 	}
 
@@ -148,7 +140,6 @@ class DataLayer {
 	private prepareEventObject(eventName: string, eventData: EventData): any {
 		const dataToSend = { ...eventData };
 
-		// Add site info on first event after page load
 		if (this.isFirstEventAfterRefresh && this.config) {
 			dataToSend.default = dataToSend.default || {};
 			dataToSend.default.site = this.config.siteInfo;
@@ -177,7 +168,6 @@ class DataLayer {
 			if (key === "default") {
 				this.handleDefaultObjectNullification(eventObj, key);
 			} else if (!(key in eventObj)) {
-				// Nullify top-level keys that aren't in the current event
 				eventObj[key] = null;
 			}
 		});
@@ -190,20 +180,16 @@ class DataLayer {
 	private handleDefaultObjectNullification(eventObj: any, key: string): void {
 		const prevValue = this.previousEvent?.[key];
 
-		// Skip if not an object or is null/array
 		if (typeof prevValue !== "object" || prevValue === null || Array.isArray(prevValue)) {
 			return;
 		}
 
-		// Create default object if it doesn't exist
 		if (!(key in eventObj) || typeof eventObj[key] !== "object" || eventObj[key] === null) {
 			eventObj[key] = {};
 		}
 
-		// Get properties that should be nullified for this key
 		const propertiesToCheck = this.propertiesToNullify[key] || [];
 
-		// Nullify each property if needed
 		propertiesToCheck.forEach((nestedKey) => {
 			const shouldNullify =
 				typeof eventObj[key] === "object" &&
@@ -222,17 +208,14 @@ class DataLayer {
 	 * @private
 	 */
 	private storeCleanPreviousEvent(eventObj: any): void {
-		// Create a deep copy of the event
 		const cleanEvent = JSON.parse(JSON.stringify(eventObj));
 
-		// Remove all top-level null properties except 'default'
 		Object.keys(cleanEvent).forEach(key => {
 			if (key !== "default" && cleanEvent[key] === null) {
 				delete cleanEvent[key];
 			}
 		});
 
-		// Clean up nullified properties in the 'default' object
 		if (cleanEvent.default && typeof cleanEvent.default === "object") {
 			Object.keys(cleanEvent.default).forEach(nestedKey => {
 				if (cleanEvent.default[nestedKey] === null) {

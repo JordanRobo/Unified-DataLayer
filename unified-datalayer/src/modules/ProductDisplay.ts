@@ -16,6 +16,8 @@ export class ProductDisplayImpl extends BaseModule implements ProductDisplayMod 
 	 * @param productData 
 	 */
 	view(productData: ProductData): void {
+		this.validateProductData(productData);
+
 		const products = [this.formatProduct(productData)];
 
 		this.clearProducts();
@@ -38,6 +40,8 @@ export class ProductDisplayImpl extends BaseModule implements ProductDisplayMod 
 	 * @param color 
 	 */
 	colorSelect(color: string): void {
+		this.validateString(color, 'color');
+
 		this.pushEvent("product_color-select", {
 			default: {
 				page: {
@@ -50,10 +54,12 @@ export class ProductDisplayImpl extends BaseModule implements ProductDisplayMod 
 	}
 
 	/**
-	 * 
+	 * This selects the size of the product
 	 * @param size 
 	 */
 	sizeSelect(size: string): void {
+		this.validateString(size, 'size');
+
 		this.pushEvent("product_size_select", {
 			default: {
 				page: {
@@ -62,6 +68,7 @@ export class ProductDisplayImpl extends BaseModule implements ProductDisplayMod 
 				}
 			},
 			products: [{ size }]
-		})
+		});
+
 	}
 }
