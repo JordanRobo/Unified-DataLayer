@@ -19,7 +19,8 @@
 		"build": "bun build ./src/index.ts --outdir ./dist --target browser --minify",
 		"build:types": "tsc --emitDeclarationOnly",
 		"test": "bun test",
-		"prepare": "bun run build && bun run build:types"
+		"prepare": "bun run build && bun run build:types",
+		"dev": "bun --watch build ./src/index.ts --outdir ./dist --target browser"
 	},
 	"devDependencies": {
 		"typescript": "^5.0.0",

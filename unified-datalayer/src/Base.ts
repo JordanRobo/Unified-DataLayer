@@ -16,8 +16,8 @@ export abstract class BaseModule {
 	 * @param eventName The name of the event
 	 * @param eventData The data to include with the event
 	 */
-	protected pushEvent(eventName: string, eventData: EventData = {}): void {
-		this.dataLayer.pushEvent(eventName, eventData);
+	protected pushEvent(eventName: string, eventData: EventData = {}): Promise<void> {
+		return this.dataLayer.pushEvent(eventName, eventData);
 	}
 
 	protected clearProducts(): void {
@@ -229,76 +229,91 @@ export abstract class BaseModule {
 			throw new Error(`${paramName} must be an object.`);
 		}
 
-		// Validate required fields
-		try {
-			this.validateString(data.brand, 'brand');
-			this.validateString(data.child_sku, 'child_sku');
-			this.validateString(data.color, 'color');
-			this.validateString(data.gender, 'gender');
-			this.validateString(data.name, 'name');
-			this.validateString(data.parent_category, 'parent_category');
-			this.validateString(data.parent_sku, 'parent_sku');
+		const validationErrors: string[] = [];
 
-			this.validateNumber(data.full_price, 'full_price', { positive: true });
-			this.validateNumber(data.listed_price, 'listed_price', { positive: true });
-
-			if (!Array.isArray(data.category)) {
-				throw new Error('category must be an array');
+		const validateField = (validationFn: () => void) => {
+			try {
+				validationFn();
+			} catch (error) {
+				// @ts-ignore
+				validationErrors.push(`${error.message}`);
 			}
-			// Validate each category is a string
+		};
+
+		validateField(() => this.validateString(data.brand, 'brand'));
+		validateField(() => this.validateString(data.child_sku, 'child_sku'));
+		validateField(() => this.validateString(data.color, 'color'));
+		validateField(() => this.validateString(data.gender, 'gender'));
+		validateField(() => this.validateString(data.name, 'name'));
+		validateField(() => this.validateString(data.parent_category, 'parent_category'));
+		validateField(() => this.validateString(data.parent_sku, 'parent_sku'));
+
+		validateField(() => this.validateNumber(data.full_price, 'full_price', { positive: true }));
+		validateField(() => this.validateNumber(data.listed_price, 'listed_price', { positive: true }));
+
+		if (!Array.isArray(data.category)) {
+			validationErrors.push('category: must be an array');
+		} else {
 			data.category.forEach((cat: any, index: number) => {
-				this.validateString(cat, `category[${index}]`);
+				validateField(() => this.validateString(cat, `category[${index}]`));
 			});
+		}
 
-			if (typeof data.sku_available !== 'boolean') {
-				throw new Error('sku_available must be a boolean');
-			}
-		} catch (error) {
-			// @ts-ignore
-			throw new Error(`${paramName} validation failed: ${error.message}`);
+		if (data.sku_available !== undefined && typeof data.sku_available !== 'boolean') {
+			validationErrors.push('sku_available: must be a boolean');
+		}
+
+		if (validationErrors.length > 0) {
+			const errorMessage = `${paramName} validation failed:\n  + ${validationErrors.join('\n  + ')}`;
+			throw new Error(errorMessage);
 		}
 	}
 
-	/**
-	 * Validates that input is of type ProductData
-	 * @param data 
-	 * @param paramName 
-	 */
 	protected validateCartProductData(data: any, paramName: string = 'cartProductData'): asserts data is CartProductData {
 		if (!data || typeof data !== 'object') {
 			throw new Error(`${paramName} must be an object.`);
 		}
 
-		// Validate required fields
-		try {
-			this.validateString(data.brand, 'brand');
-			this.validateString(data.child_sku, 'child_sku');
-			this.validateString(data.color, 'color');
-			this.validateString(data.gender, 'gender');
-			this.validateString(data.name, 'name');
-			this.validateString(data.parent_category, 'parent_category');
-			this.validateString(data.parent_sku, 'parent_sku');
-			this.validateString(data.sku_by_size, 'sku_by_size');
-			this.validateString(data.size, 'size');
+		const validationErrors: string[] = [];
 
-			this.validateNumber(data.full_price, 'full_price', { positive: true });
-			this.validateNumber(data.listed_price, 'listed_price', { positive: true });
-			this.validateNumber(data.qty, 'qty', { positive: true });
-
-			if (!Array.isArray(data.category)) {
-				throw new Error('category must be an array');
+		const validateField = (validationFn: () => void) => {
+			try {
+				validationFn();
+			} catch (error) {
+				// @ts-ignore
+				validationErrors.push(`${error.message}`);
 			}
-			// Validate each category is a string
+		};
+
+		validateField(() => this.validateString(data.brand, 'brand'));
+		validateField(() => this.validateString(data.child_sku, 'child_sku'));
+		validateField(() => this.validateString(data.color, 'color'));
+		validateField(() => this.validateString(data.gender, 'gender'));
+		validateField(() => this.validateString(data.name, 'name'));
+		validateField(() => this.validateString(data.parent_category, 'parent_category'));
+		validateField(() => this.validateString(data.parent_sku, 'parent_sku'));
+		validateField(() => this.validateString(data.sku_by_size, 'sku_by_size'));
+		validateField(() => this.validateString(data.size, 'size'));
+
+		validateField(() => this.validateNumber(data.full_price, 'full_price', { positive: true }));
+		validateField(() => this.validateNumber(data.listed_price, 'listed_price', { positive: true }));
+		validateField(() => this.validateNumber(data.qty, 'qty', { positive: true }));
+
+		if (!Array.isArray(data.category)) {
+			validationErrors.push('category: must be an array');
+		} else {
 			data.category.forEach((cat: any, index: number) => {
-				this.validateString(cat, `category[${index}]`);
+				validateField(() => this.validateString(cat, `category[${index}]`));
 			});
+		}
 
-			if (typeof data.sku_available !== 'boolean') {
-				throw new Error('sku_available must be a boolean');
-			}
-		} catch (error) {
-			// @ts-ignore
-			throw new Error(`${paramName} validation failed: ${error.message}`);
+		if (data.sku_available !== undefined && typeof data.sku_available !== 'boolean') {
+			validationErrors.push('sku_available: must be a boolean');
+		}
+
+		if (validationErrors.length > 0) {
+			const errorMessage = `${paramName} validation failed:\n  + ${validationErrors.join('\n  + ')}`;
+			throw new Error(errorMessage);
 		}
 	}
 

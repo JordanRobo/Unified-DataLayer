@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unified DataLayer Test</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="container">
+        <div class="test-container">
+            <h1>Unified DataLayer Test Page</h1>
+
+            <div class="test-section">
+                <h2>Page View Tests</h2>
+            
+                <h3>page_default</h3>
+                <div class="test-buttons">
+                    <button id="home-view">Home View</button>
+                    <button id="default-view-valid">Other Page View</button>
+                    <button id="default-view-invalid" class="error-button">Missing Page Type</button>
+                </div>
+            </div>
+
+            <div class="test-section">
+                <h2>Product Listing Page (PLP) Tests</h2>
+                        
+                <h3>product_listing-view</h3>
+                <div class="test-buttons">
+                    <button id="plp-view-valid">Valid Input</button>
+                    <button id="plp-view-invalid" class="error-button">Invalid Input</button>
+                    <button id="plp-view-empty" class="error-button">Empty Input</button>
+                </div>
+                        
+                <h3>product_listing-filters</h3>
+                <div class="test-buttons">
+                    <button id="plp-filter-valid">Valid Input</button>
+                    <button id="plp-filter-invalid" class="error-button">Invalid Input</button>
+                    <button id="plp-filter-empty" class="error-button">Empty Input</button>
+                </div>
+                        
+                <h3>product_listing-sort</h3>
+                <div class="test-buttons">
+                    <button id="plp-sort-valid">Valid Input</button>
+                    <button id="plp-sort-invalid" class="error-button">Invalid Input</button>
+                    <button id="plp-sort-empty" class="error-button">Empty Input</button>
+                </div>
+            </div>
+
+            <div class="test-section">
+                <h2>Product Display Page (PDP) Tests</h2>
+
+                <h3>product_view</h3>
+                <div class="test-buttons">
+                    <button id="pdp-view-valid">Valid Input</button>
+                    <button id="pdp-view-invalid" class="error-button">Invalid Input</button>
+                    <button id="pdp-view-empty" class="error-button">Empty Input</button>
+                </div>
+
+                <h3>product_size-select</h3>
+                <div class="test-buttons">
+                    <button id="pdp-size-valid">Valid Input</button>
+                    <button id="pdp-size-invalid" class="error-button">Invalid Input</button>
+                    <button id="pdp-size-empty" class="error-button">Empty Input</button>
+                </div>
+
+                <h3>product_color-select</h3>
+                <div class="test-buttons">
+                    <button id="pdp-color-valid">Valid Input</button>
+                    <button id="pdp-color-invalid" class="error-button">Invalid Input</button>
+                    <button id="pdp-color-empty" class="error-button">Empty Input</button>
+                </div>
+            </div>
+
+            <!-- Add more test sections here -->
+        </div>
+
+        <div class="console-container">
+            <div class="console-box">
+                <h2>Console Output</h2>
+                <div id="console-output" class="console"></div>
+            </div>
+
+            <div class="console-box">
+                <h2>
+                    Data Layer State
+                    <button id="refresh-data-layer" class="refresh-button">Refresh</button>
+                </h2>
+                <div id="data-layer-output" class="console">
+                    <div class="console-entry data-layer">Waiting for data layer to initialise...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Load the DataLayer bundle -->
+    <script src="script.js"></script>
+    <script src="https://unpkg.com/@adobe/adobe-client-data-layer@2.0.1/dist/adobe-client-data-layer.min.js" async
+        defer></script>
+</body>
+
+</html>

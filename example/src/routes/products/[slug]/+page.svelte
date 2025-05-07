@@ -43,7 +43,7 @@
 
 	function selectSize(size: string){
 		selected_size = size;
-		dl.pdp.sizeSelect(selected_size);	
+		dl.pdp.sizeSelect(10);
 	}
 
 	function sendToDataLayer() {

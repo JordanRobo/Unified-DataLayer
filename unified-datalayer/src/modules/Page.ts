@@ -36,17 +36,23 @@ export class PageImpl extends BaseModule implements PageMod {
 	 * @param action The action performed on the page (default: "view")
 	 */
 	public view(pageType: string, action: string = "view"): void {
-		this.pushEvent("page_default", {
-			default: {
-				page: {
-					type: pageType,
-					action: action,
-					path: typeof window !== "undefined" ? window.location.pathname : "",
-					title: typeof document !== "undefined" ? this.formatString(document.title) : "",
-					url: typeof window !== "undefined" ? window.location.href : "",
+		try {
+			this.validateString(pageType, 'pageType');
+
+			this.pushEvent("page_default", {
+				default: {
+					page: {
+						type: pageType,
+						action: action,
+						path: typeof window !== "undefined" ? window.location.pathname : "",
+						title: typeof document !== "undefined" ? this.formatString(document.title) : "",
+						url: typeof window !== "undefined" ? window.location.href : "",
+					},
 				},
-			},
-		});
+			});
+		} catch (error: any) {
+			console.error(`[unified-datalayer] Data Validation Error: ${error.message}`)
+		}
 	}
 
 	/**

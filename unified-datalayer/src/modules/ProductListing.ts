@@ -77,25 +77,37 @@ export class ProductListingImpl extends BaseModule implements ProductListingMod 
 	 * // With custom list name
 	 * dl.plp.view(products, "Summer Collection");
 	 */
-	view(productsArray: ProductData[], listName?: string): void {
-		const list_name = listName || (typeof window !== "undefined" ? window.location.pathname.split("/").filter(Boolean).pop() : "");
+	public view(productsArray: ProductData[], listName?: string): void {
+		try {
+			const list_name = listName || (typeof window !== "undefined" ? window.location.pathname.split("/").filter(Boolean).pop() : "");
 
-		const products: PLP_Product[] = productsArray.map((product, i) => ({
-			position: i,
-			...this.formatProduct(product),
-		}));
+			if (!productsArray) {
+				throw new Error('productsArray must be an array of ProductData.', { cause: 'Empty Input' });
+			}
 
-		this.clearProducts();
-		this.pushEvent("product_listing-view", {
-			default: {
-				page: {
-					type: "product",
-					action: "listing-view",
-					list_name,
+			productsArray.forEach(product => {
+				this.validateProductData(product);
+			});
+
+			const products: PLP_Product[] = productsArray.map((product, i) => ({
+				position: i,
+				...this.formatProduct(product),
+			}));
+
+			this.clearProducts();
+			this.pushEvent("product_listing-view", {
+				default: {
+					page: {
+						type: "product",
+						action: "listing-view",
+						list_name,
+					},
 				},
-			},
-			products,
-		});
+				products,
+			});
+		} catch (error: any) {
+			console.error(`[unified-datalayer] ${error.cause}: ${error.message}`)
+		}
 	}
 
 	/**
@@ -132,16 +144,25 @@ export class ProductListingImpl extends BaseModule implements ProductListingMod 
 	 *   filter_value: "womens,sneakers,sale|50-100|red,blue"
 	 * });
 	 */
-	filter(list_filters: ListFilters): void {
-		this.pushEvent("product_listing-filters", {
-			default: {
-				page: {
-					type: "product",
-					action: "listing-filters"
-				}
-			},
-			list_filters
-		})
+	public filter(list_filters: ListFilters): void {
+		try {
+			this.validateMultiple([
+				{ value: list_filters.filter_type, paramName: 'filter_type', type: 'string' },
+				{ value: list_filters.filter_value, paramName: 'filter_value', type: 'string' }
+			])
+
+			this.pushEvent("product_listing-filters", {
+				default: {
+					page: {
+						type: "product",
+						action: "listing-filters"
+					}
+				},
+				list_filters
+			})
+		} catch (error: any) {
+			console.error(`[unified-datalayer] Data Validation Error: ${error.message}`)
+		}
 	}
 
 	/**
@@ -167,19 +188,26 @@ export class ProductListingImpl extends BaseModule implements ProductListingMod 
 	 * // Track when a user sorts products by newest first
 	 * dl.plp.sort("newest");
 	 */
-	sort(option: string): void {
-		this.pushEvent("product_listing-sort", {
-			default: {
-				page: {
-					type: "product",
-					action: "listing-sort"
+	public sort(option: string): void {
+		try {
+			this.validateString(option, 'option');
+
+			this.pushEvent("product_listing-sort", {
+				default: {
+					page: {
+						type: "product",
+						action: "listing-sort"
+					}
+				},
+				list_sort: {
+					option
 				}
-			},
-			list_sort: {
-				option
-			}
-		})
+			})
+		} catch (error: any) {
+			console.error(`[unified-datalayer] Data Validation Error: ${error.message}`)
+		}
+		
 	}
 
-	click(): void {}
+	public click(): void {}
 }

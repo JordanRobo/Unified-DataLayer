@@ -104,19 +104,34 @@ class DataLayer {
 	 * @param eventData Object containing the event data
 	 * @throws Error if DataLayer has not been initialised with siteInfo
 	 */
-	public pushEvent(eventName: string, eventData: EventData = {}): void {
-		this.validateInitialisation();
+	public pushEvent(eventName: string, eventData: EventData = {}): Promise<void> {
+		try {
+			this.validateInitialisation();
 
-		if (typeof window === "undefined") {
-			console.log(`Event would be pushed: ${eventName}`, eventData);
-			return;
+			if (typeof window === "undefined") {
+				console.log(`Event would be pushed: ${eventName}`, eventData);
+				return Promise.resolve();
+			}
+
+			const eventObj = this.prepareEventObject(eventName, eventData);
+			this.applyNullificationLogic(eventObj);
+
+			const result = new Promise<void>((resolve, reject) => {
+				try {
+					this.dataLayer.push(eventObj);
+					this.storeCleanPreviousEvent(eventObj);
+					resolve();
+				} catch (error) {
+					console.error(`Error pushing to data layer:`, error);
+					reject(error);
+				}
+			});
+
+			return result;
+		} catch (error) {
+			console.error(`Error in pushEvent (${eventName}):`, error);
+			return Promise.reject(error);
 		}
-
-		const eventObj = this.prepareEventObject(eventName, eventData);
-
-		this.applyNullificationLogic(eventObj);
-		this.dataLayer.push(eventObj);
-		this.storeCleanPreviousEvent(eventObj);
 	}
 
 	public clearProducts(): void {

@@ -1,0 +1,103 @@
+{
+    "valid": [
+        {
+            "brand": "StrideRight",
+            "category": [
+                "Running",
+                "Performance",
+                "Outdoor"
+            ],
+            "child_sku": "SR-RUN-2025-BLK-10",
+            "color": "Black/Neon",
+            "full_price": 129.99,
+            "gender": "Men",
+            "listed_price": 99.99,
+            "name": "AeroGlide Pro",
+            "parent_category": "Athletic",
+            "parent_sku": "SR-RUN-2025",
+            "sku_available": true,
+            "weight": 245,
+            "release_date": "2025-01-15",
+            "materials": [
+                "Synthetic mesh",
+                "Rubber",
+                "EVA foam"
+            ]
+        },
+        {
+            "brand": "UrbanStep",
+            "category": [
+                "Casual",
+                "Lifestyle",
+                "Streetwear"
+            ],
+            "child_sku": "US-RETRO-212-WHT-08",
+            "color": "White/Navy",
+            "full_price": 89.99,
+            "gender": "Women",
+            "listed_price": 89.99,
+            "name": "Retro Classic",
+            "parent_category": "Casual",
+            "parent_sku": "US-RETRO-212",
+            "sku_available": true,
+            "comfort_rating": 4.5,
+            "waterproof": false,
+            "styles": [
+                "Vintage",
+                "Minimalist"
+            ],
+            "limited_edition": false
+        },
+        {
+            "brand": "HikeMaster",
+            "category": [
+                "Hiking",
+                "Outdoor",
+                "Trail"
+            ],
+            "child_sku": "HM-TRL-X50-BRN-09",
+            "color": "Brown/Green",
+            "full_price": 159.99,
+            "gender": "Unisex",
+            "listed_price": 129.99,
+            "name": "TrailBlazer X50",
+            "parent_category": "Outdoor",
+            "parent_sku": "HM-TRL-X50",
+            "sku_available": false,
+            "waterproof": true,
+            "ankle_support": "High",
+            "terrain_type": [
+                "Rocky",
+                "Muddy",
+                "Forest"
+            ],
+            "weight": 425,
+            "sustainable": true
+        }
+    ],
+    "invalid": [
+        {
+            "category": [
+                "Running",
+                "Performance",
+                "Outdoor"
+            ],
+            "child_sku": "SR-RUN-2025-BLK-10",
+            "color": "Black/Neon",
+            "gender": "Men",
+            "listed_price": 99.99,
+            "parent_sku": "",
+            "name": "AeroGlide Pro",
+            "parent_category": "Athletic",
+            "sku_available": true,
+            "full_price": "99.99",
+            "weight": 245,
+            "release_date": "2025-01-15",
+            "materials": [
+                "Synthetic mesh",
+                "Rubber",
+                "EVA foam"
+            ]
+        }
+    ]
+}
