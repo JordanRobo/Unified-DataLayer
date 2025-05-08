@@ -7,9 +7,24 @@ export interface CheckoutMod {
 }
 
 export class CheckoutImpl extends BaseModule implements CheckoutMod {
-	start(): void {}
+	start(): void {
+		try {
+		} catch (error: any) {
+			console.error(`[unified-datalayer] ${error.cause}: ${error.message}`);
+		}
+	}
 
-	step2(): void {}
+	step2(): void {
+		try {
+		} catch (error: any) {
+			console.error(`[unified-datalayer] ${error.cause}: ${error.message}`);
+		}
+	}
 
-	step3(): void {}
+	step3(): void {
+		try {
+		} catch (error: any) {
+			console.error(`[unified-datalayer] ${error.cause}: ${error.message}`);
+		}
+	}
 }

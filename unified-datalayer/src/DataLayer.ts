@@ -1,6 +1,7 @@
 import { AccountImpl, AccountMod } from "./modules/Account";
 import { CartImpl, CartMod } from "./modules/Cart";
 import { CheckoutImpl, CheckoutMod } from "./modules/Checkout";
+import { OrderImpl, OrderModule } from "./modules/Order";
 import { PageMod, PageImpl } from "./modules/Page";
 import { ProductDisplayMod, ProductDisplayImpl } from "./modules/ProductDisplay";
 import { ProductListingImpl, ProductListingMod } from "./modules/ProductListing";
@@ -32,6 +33,7 @@ class DataLayer {
 	public checkout: CheckoutMod;
 	public account: AccountMod;
 	public wishlist: WishlistMod;
+	public order: OrderModule;
 
 	/**
 	 * Constructor initialises the data layer and all modules
@@ -49,6 +51,7 @@ class DataLayer {
 		this.checkout = new CheckoutImpl(this);
 		this.account = new AccountImpl(this);
 		this.wishlist = new WishlistImpl(this);
+		this.order = new OrderImpl(this);
 	}
 
 	/**
@@ -65,9 +68,9 @@ class DataLayer {
 	 * Initialise the DataLayer with configuration options
 	 * @param {DataLayerConfig} options Configuration options including required site information
 	 * @throws Error if siteInfo is not provided
-	 * @example 
+	 * @example
 	 * const dl = getDataLayer();
-	 * 
+	 *
 	 * dl.init({
 	 * 	siteInfo: {
 	 * 		name: "my-site",
@@ -86,14 +89,14 @@ class DataLayer {
 		}
 
 		this.config = options;
-		
+
 		if (typeof window !== "undefined") {
 			this.user = {
 				user_state: window.localStorage.getItem("uem_hashed") ? "customer" : "guest",
 				login_state: window.localStorage.getItem("uem_hashed") ? "logged-in" : "anonymous",
 				uem_hashed: window.localStorage.getItem("uem_hashed") ?? "",
 				session_id: "",
-				division_id: ""
+				division_id: "",
 			};
 		}
 	}
@@ -121,21 +124,21 @@ class DataLayer {
 					this.dataLayer.push(eventObj);
 					this.storeCleanPreviousEvent(eventObj);
 					resolve();
-				} catch (error) {
-					console.error(`Error pushing to data layer:`, error);
+				} catch (error: any) {
+					console.error(`Error pushing to data layer:`, error.message);
 					reject(error);
 				}
 			});
 
 			return result;
-		} catch (error) {
-			console.error(`Error in pushEvent (${eventName}):`, error);
+		} catch (error: any) {
+			console.error(`Error in pushEvent (${eventName}):`, error.message);
 			return Promise.reject(error);
 		}
 	}
 
 	public clearProducts(): void {
-		this.dataLayer.push({products: null})
+		this.dataLayer.push({ products: null });
 	}
 
 	/**
@@ -206,11 +209,7 @@ class DataLayer {
 		const propertiesToCheck = this.propertiesToNullify[key] || [];
 
 		propertiesToCheck.forEach((nestedKey) => {
-			const shouldNullify =
-				typeof eventObj[key] === "object" &&
-				eventObj[key] !== null &&
-				nestedKey in prevValue &&
-				!(nestedKey in eventObj[key]);
+			const shouldNullify = typeof eventObj[key] === "object" && eventObj[key] !== null && nestedKey in prevValue && !(nestedKey in eventObj[key]);
 
 			if (shouldNullify) {
 				eventObj[key][nestedKey] = null;
@@ -225,14 +224,14 @@ class DataLayer {
 	private storeCleanPreviousEvent(eventObj: any): void {
 		const cleanEvent = JSON.parse(JSON.stringify(eventObj));
 
-		Object.keys(cleanEvent).forEach(key => {
+		Object.keys(cleanEvent).forEach((key) => {
 			if (key !== "default" && cleanEvent[key] === null) {
 				delete cleanEvent[key];
 			}
 		});
 
 		if (cleanEvent.default && typeof cleanEvent.default === "object") {
-			Object.keys(cleanEvent.default).forEach(nestedKey => {
+			Object.keys(cleanEvent.default).forEach((nestedKey) => {
 				if (cleanEvent.default[nestedKey] === null) {
 					delete cleanEvent.default[nestedKey];
 				}

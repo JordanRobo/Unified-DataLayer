@@ -12,11 +12,11 @@ export interface ProductDisplayMod {
 
 export class ProductDisplayImpl extends BaseModule implements ProductDisplayMod {
 	/**
-	 * 
-	 * @param productData 
+	 *
+	 * @param productData
 	 */
 	view(productData: ProductData): void {
-		try{ 
+		try {
 			this.validateProductData(productData);
 
 			const products = [this.formatProduct(productData)];
@@ -35,18 +35,17 @@ export class ProductDisplayImpl extends BaseModule implements ProductDisplayMod 
 				products,
 			});
 		} catch (error: any) {
-			console.error(`[unified-datalayer] Data Validation Error: ${error.message}`)
+			console.error(`[unified-datalayer] ${error.cause}: ${error.message}`);
 		}
-		
 	}
 
 	/**
-	 * 
-	 * @param color 
+	 *
+	 * @param color
 	 */
 	colorSelect(color: string): void {
 		try {
-			this.validateString(color, 'color');
+			this.validateString(color, "color");
 
 			this.pushEvent("product_color-select", {
 				default: {
@@ -58,29 +57,29 @@ export class ProductDisplayImpl extends BaseModule implements ProductDisplayMod 
 				products: [{ color }],
 			});
 		} catch (error: any) {
-			console.error(`[unified-datalayer] Data Validation Error: ${error.message}`)
+			console.error(`[unified-datalayer] ${error.cause}: ${error.message}`);
 		}
 	}
 
 	/**
 	 * This selects the size of the product
-	 * @param size 
+	 * @param size
 	 */
 	sizeSelect(size: any): void {
 		try {
-			this.validateString(size, 'size');
+			this.validateString(size, "size");
 
 			this.pushEvent("product_size-select", {
 				default: {
 					page: {
 						type: "product",
-						action: "size-select"
-					}
+						action: "size-select",
+					},
 				},
-				products: [{ size }]
-			})
+				products: [{ size }],
+			});
 		} catch (error: any) {
-			console.error(`[unified-datalayer] Data Validation Error: ${error.message}`)
+			console.error(`[unified-datalayer] ${error.cause}: ${error.message}`);
 		}
 	}
 }

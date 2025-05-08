@@ -16,7 +16,7 @@ export abstract class BaseModule {
 	 * @param eventName The name of the event
 	 * @param eventData The data to include with the event
 	 */
-	protected pushEvent(eventName: string, eventData: EventData = {}): Promise<void> {
+	public pushEvent(eventName: string, eventData: EventData = {}): Promise<void> {
 		return this.dataLayer.pushEvent(eventName, eventData);
 	}
 
@@ -112,108 +112,106 @@ export abstract class BaseModule {
 	}
 
 	/**
-	* Validates that a string parameter meets requirements
-	*/
-	protected validateString(value: any, paramName: string, options: {
-		required?: boolean;
-		allowEmpty?: boolean;
-		minLength?: number;
-		maxLength?: number;
-		pattern?: RegExp;
-	} = {}): void {
-		const {
-			required = true,
-			allowEmpty = false,
-			minLength,
-			maxLength,
-			pattern
-		} = options;
+	 * Validates that a string parameter meets requirements
+	 */
+	protected validateString(
+		value: any,
+		paramName: string,
+		options: {
+			required?: boolean;
+			allowEmpty?: boolean;
+			minLength?: number;
+			maxLength?: number;
+			pattern?: RegExp;
+		} = {},
+	): void {
+		const { required = true, allowEmpty = false, minLength, maxLength, pattern } = options;
 
 		if (required && (value === undefined || value === null)) {
-			throw new Error(`${paramName} is required.`);
+			throw new Error(`${paramName} is required.`, { cause: "REQUIRED_FIELD_MISSING" });
 		}
 
-		if (typeof value !== 'string') {
-			throw new Error(`${paramName} must be a string.`);
+		if (typeof value !== "string") {
+			throw new Error(`${paramName} must be a string.`, { cause: "TYPE_MISMATCH" });
 		}
 
 		if (!allowEmpty && value.trim().length === 0) {
-			throw new Error(`${paramName} cannot be empty or whitespace.`);
+			throw new Error(`${paramName} cannot be empty or whitespace.`, { cause: "EMPTY_VALUE_NOT_ALLOWED" });
 		}
 
 		if (minLength !== undefined && value.length < minLength) {
-			throw new Error(`${paramName} must be at least ${minLength} characters long.`);
+			throw new Error(`${paramName} must be at least ${minLength} characters long.`, { cause: "STRING_LENGTH_VIOLATION" });
 		}
 
 		if (maxLength !== undefined && value.length > maxLength) {
-			throw new Error(`${paramName} cannot exceed ${maxLength} characters.`);
+			throw new Error(`${paramName} cannot exceed ${maxLength} characters.`, { cause: "STRING_LENGTH_VIOLATION" });
 		}
 
 		if (pattern && !pattern.test(value)) {
-			throw new Error(`${paramName} format is invalid.`);
+			throw new Error(`${paramName} format is invalid.`, { cause: "PATTERN_MISMATCH" });
 		}
 	}
 
 	/**
 	 * Validates that a number parameter meets requirements
 	 */
-	protected validateNumber(value: any, paramName: string, options: {
-		required?: boolean;
-		integer?: boolean;
-		min?: number;
-		max?: number;
-		positive?: boolean;
-	} = {}): void {
-		const {
-			required = true,
-			integer = false,
-			min,
-			max,
-			positive = false
-		} = options;
+	protected validateNumber(
+		value: any,
+		paramName: string,
+		options: {
+			required?: boolean;
+			integer?: boolean;
+			min?: number;
+			max?: number;
+			positive?: boolean;
+		} = {},
+	): void {
+		const { required = true, integer = false, min, max, positive = false } = options;
 
 		if (required && (value === undefined || value === null)) {
-			throw new Error(`${paramName} is required.`);
+			throw new Error(`${paramName} is required.`, { cause: "REQUIRED_FIELD_MISSING" });
 		}
 
-		if (typeof value !== 'number') {
-			throw new Error(`${paramName} must be a number.`);
+		if (typeof value !== "number") {
+			throw new Error(`${paramName} must be a number.`, { cause: "TYPE_MISMATCH" });
 		}
 
 		if (isNaN(value)) {
-			throw new Error(`${paramName} must be a valid number.`);
+			throw new Error(`${paramName} must be a valid number.`, { cause: "TYPE_MISMATCH" });
 		}
 
 		if (integer && !Number.isInteger(value)) {
-			throw new Error(`${paramName} must be an integer.`);
+			throw new Error(`${paramName} must be an integer.`, { cause: "TYPE_MISMATCH" });
 		}
 
 		if (positive && value < 0) {
-			throw new Error(`${paramName} must be positive.`);
+			throw new Error(`${paramName} must be positive.`, { cause: "VALUE_OUT_OF_RANGE" });
 		}
 
 		if (min !== undefined && value < min) {
-			throw new Error(`${paramName} must be at least ${min}.`);
+			throw new Error(`${paramName} must be at least ${min}.`, { cause: "VALUE_OUT_OF_RANGE" });
 		}
 
 		if (max !== undefined && value > max) {
-			throw new Error(`${paramName} cannot exceed ${max}.`);
+			throw new Error(`${paramName} cannot exceed ${max}.`, { cause: "VALUE_OUT_OF_RANGE" });
 		}
 	}
 
 	/**
 	 * Validates multiple arguments at once
 	 */
-	protected validateMultiple(validations: Array<{
-		value: any;
-		paramName: string;
-		type: 'string' | 'number';
-		options?: any;
-	}>): void {
+	protected validateMultiple(
+		validations: Array<{
+			value: any;
+			paramName: string;
+			type: "string" | "number";
+			options?: any;
+		}>,
+	): void {
 		for (const validation of validations) {
-			if (validation.type === 'string') {
+			if (validation.type === "string") {
 				this.validateString(validation.value, validation.paramName, validation.options);
-			} else if (validation.type === 'number') {
+			} else if (validation.type === "number") {
 				this.validateNumber(validation.value, validation.paramName, validation.options);
 			}
 		}
@@ -221,12 +219,12 @@ export abstract class BaseModule {
 
 	/**
 	 * Validates that input is of type ProductData
-	 * @param data 
-	 * @param paramName 
+	 * @param data
+	 * @param paramName
 	 */
-	protected validateProductData(data: any, paramName: string = 'productData'): asserts data is ProductData {
-		if (!data || typeof data !== 'object') {
-			throw new Error(`${paramName} must be an object.`);
+	protected validateProductData(data: any, paramName: string = "productData"): asserts data is ProductData {
+		if (!data || typeof data !== "object") {
+			throw new Error(`${paramName} must be an object.`, { cause: "FORMAT_VALIDATION_FAILED" });
 		}
 
 		const validationErrors: string[] = [];
@@ -240,38 +238,38 @@ export abstract class BaseModule {
 			}
 		};
 
-		validateField(() => this.validateString(data.brand, 'brand'));
-		validateField(() => this.validateString(data.child_sku, 'child_sku'));
-		validateField(() => this.validateString(data.color, 'color'));
-		validateField(() => this.validateString(data.gender, 'gender'));
-		validateField(() => this.validateString(data.name, 'name'));
-		validateField(() => this.validateString(data.parent_category, 'parent_category'));
-		validateField(() => this.validateString(data.parent_sku, 'parent_sku'));
+		validateField(() => this.validateString(data.brand, "brand"));
+		validateField(() => this.validateString(data.child_sku, "child_sku"));
+		validateField(() => this.validateString(data.color, "color"));
+		validateField(() => this.validateString(data.gender, "gender"));
+		validateField(() => this.validateString(data.name, "name"));
+		validateField(() => this.validateString(data.parent_category, "parent_category"));
+		validateField(() => this.validateString(data.parent_sku, "parent_sku"));
 
-		validateField(() => this.validateNumber(data.full_price, 'full_price', { positive: true }));
-		validateField(() => this.validateNumber(data.listed_price, 'listed_price', { positive: true }));
+		validateField(() => this.validateNumber(data.full_price, "full_price", { positive: true }));
+		validateField(() => this.validateNumber(data.listed_price, "listed_price", { positive: true }));
 
 		if (!Array.isArray(data.category)) {
-			validationErrors.push('category: must be an array');
+			validationErrors.push("category: must be an array");
 		} else {
 			data.category.forEach((cat: any, index: number) => {
 				validateField(() => this.validateString(cat, `category[${index}]`));
 			});
 		}
 
-		if (data.sku_available !== undefined && typeof data.sku_available !== 'boolean') {
-			validationErrors.push('sku_available: must be a boolean');
+		if (data.sku_available !== undefined && typeof data.sku_available !== "boolean") {
+			validationErrors.push("sku_available: must be a boolean");
 		}
 
 		if (validationErrors.length > 0) {
-			const errorMessage = `${paramName} validation failed:\n  + ${validationErrors.join('\n  + ')}`;
-			throw new Error(errorMessage);
+			const errorMessage = `${paramName} validation failed:\n  + ${validationErrors.join("\n  + ")}`;
+			throw new Error(errorMessage, { cause: "FORMAT_VALIDATION_FAILED" });
 		}
 	}
 
-	protected validateCartProductData(data: any, paramName: string = 'cartProductData'): asserts data is CartProductData {
-		if (!data || typeof data !== 'object') {
-			throw new Error(`${paramName} must be an object.`);
+	protected validateCartProductData(data: any, paramName: string = "cartProductData"): asserts data is CartProductData {
+		if (!data || typeof data !== "object") {
+			throw new Error(`${paramName} must be an object.`, { cause: "FORMAT_VALIDATION_FAILED" });
 		}
 
 		const validationErrors: string[] = [];
@@ -285,36 +283,35 @@ export abstract class BaseModule {
 			}
 		};
 
-		validateField(() => this.validateString(data.brand, 'brand'));
-		validateField(() => this.validateString(data.child_sku, 'child_sku'));
-		validateField(() => this.validateString(data.color, 'color'));
-		validateField(() => this.validateString(data.gender, 'gender'));
-		validateField(() => this.validateString(data.name, 'name'));
-		validateField(() => this.validateString(data.parent_category, 'parent_category'));
-		validateField(() => this.validateString(data.parent_sku, 'parent_sku'));
-		validateField(() => this.validateString(data.sku_by_size, 'sku_by_size'));
-		validateField(() => this.validateString(data.size, 'size'));
+		validateField(() => this.validateString(data.brand, "brand"));
+		validateField(() => this.validateString(data.child_sku, "child_sku"));
+		validateField(() => this.validateString(data.color, "color"));
+		validateField(() => this.validateString(data.gender, "gender"));
+		validateField(() => this.validateString(data.name, "name"));
+		validateField(() => this.validateString(data.parent_category, "parent_category"));
+		validateField(() => this.validateString(data.parent_sku, "parent_sku"));
+		validateField(() => this.validateString(data.sku_by_size, "sku_by_size"));
+		validateField(() => this.validateString(data.size, "size"));
 
-		validateField(() => this.validateNumber(data.full_price, 'full_price', { positive: true }));
-		validateField(() => this.validateNumber(data.listed_price, 'listed_price', { positive: true }));
-		validateField(() => this.validateNumber(data.qty, 'qty', { positive: true }));
+		validateField(() => this.validateNumber(data.full_price, "full_price", { positive: true }));
+		validateField(() => this.validateNumber(data.listed_price, "listed_price", { positive: true }));
+		validateField(() => this.validateNumber(data.qty, "qty", { positive: true }));
 
 		if (!Array.isArray(data.category)) {
-			validationErrors.push('category: must be an array');
+			validationErrors.push("category: must be an array");
 		} else {
 			data.category.forEach((cat: any, index: number) => {
 				validateField(() => this.validateString(cat, `category[${index}]`));
 			});
 		}
 
-		if (data.sku_available !== undefined && typeof data.sku_available !== 'boolean') {
-			validationErrors.push('sku_available: must be a boolean');
+		if (data.sku_available !== undefined && typeof data.sku_available !== "boolean") {
+			validationErrors.push("sku_available: must be a boolean");
 		}
 
 		if (validationErrors.length > 0) {
-			const errorMessage = `${paramName} validation failed:\n  + ${validationErrors.join('\n  + ')}`;
-			throw new Error(errorMessage);
+			const errorMessage = `${paramName} validation failed:\n  + ${validationErrors.join("\n  + ")}`;
+			throw new Error(errorMessage, { cause: "FORMAT_VALIDATION_FAILED" });
 		}
 	}
-
 }

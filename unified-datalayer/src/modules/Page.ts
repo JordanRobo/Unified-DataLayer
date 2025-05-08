@@ -37,7 +37,7 @@ export class PageImpl extends BaseModule implements PageMod {
 	 */
 	public view(pageType: string, action: string = "view"): void {
 		try {
-			this.validateString(pageType, 'pageType');
+			this.validateString(pageType, "pageType");
 
 			this.pushEvent("page_default", {
 				default: {
@@ -51,7 +51,7 @@ export class PageImpl extends BaseModule implements PageMod {
 				},
 			});
 		} catch (error: any) {
-			console.error(`[unified-datalayer] Data Validation Error: ${error.message}`)
+			console.error(`[unified-datalayer] ${error.cause}: ${error.message}`);
 		}
 	}
 

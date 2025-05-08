@@ -2,3 +2,5 @@
 */.svelte-kit
 */dist
 */.env
+node_modules
+dist
