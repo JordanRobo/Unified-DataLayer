@@ -38,6 +38,7 @@ export class PageImpl extends BaseModule implements PageMod {
 	public view(pageType: string, action: string = "view"): void {
 		try {
 			this.validateString(pageType, "pageType");
+			this.validateString(action, "action");
 
 			this.pushEvent("page_default", {
 				default: {

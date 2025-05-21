@@ -12,8 +12,29 @@ export interface ProductDisplayMod {
 
 export class ProductDisplayImpl extends BaseModule implements ProductDisplayMod {
 	/**
-	 *
-	 * @param productData
+	 * Push a 'product_view' event to the datalayer
+	 * 
+	 * Used when a user views a single product detail page.
+	 * This event should be triggered once when the product detail page initially loads.
+	 * 
+	 * @param {ProductData} productData - The product data object for the viewed product
+	 * 
+	 * @returns {void}
+	 * 
+	 * @example
+	 * // Track when a user views a product detail page
+	 * const dl = getDataLayer();
+	 * 
+	 * const product = {
+	 *   item_id: "SKU456",
+	 *   item_name: "Premium Running Shoes",
+	 *   price: 89.99,
+	 *   // other product properties...
+	 * };
+	 * 
+	 * dl.product.view(product);
+	 * 
+	 * @throws {Error} If product data validation fails, including missing required fields
 	 */
 	view(productData: ProductData): void {
 		try {
@@ -40,8 +61,23 @@ export class ProductDisplayImpl extends BaseModule implements ProductDisplayMod 
 	}
 
 	/**
-	 *
-	 * @param color
+	 * Push a 'product_color-select' event to the datalayer
+	 * 
+	 * Used when a user selects a color option on a product detail page.
+	 * This event should be triggered each time the user changes the color selection.
+	 * 
+	 * @param {string} color - The selected color value
+	 * 
+	 * @returns {void}
+	 * 
+	 * @example
+	 * // Track when a user selects a color for a product
+	 * const dl = getDataLayer();
+	 * 
+	 * // When user clicks on or selects the "Navy Blue" color option
+	 * dl.product.colorSelect("Navy Blue");
+	 * 
+	 * @throws {Error} If color parameter validation fails (e.g., empty string)
 	 */
 	colorSelect(color: string): void {
 		try {
@@ -62,10 +98,25 @@ export class ProductDisplayImpl extends BaseModule implements ProductDisplayMod 
 	}
 
 	/**
-	 * This selects the size of the product
-	 * @param size
+	 * Push a 'product_size-select' event to the datalayer
+	 * 
+	 * Used when a user selects a size option on a product detail page.
+	 * This event should be triggered each time the user changes the size selection.
+	 * 
+	 * @param {string} size - The selected size value
+	 * 
+	 * @returns {void}
+	 * 
+	 * @example
+	 * // Track when a user selects a size for a product
+	 * const dl = getDataLayer();
+	 * 
+	 * // When user clicks on or selects the "Medium" size option
+	 * dl.product.sizeSelect("Medium");
+	 * 
+	 * @throws {Error} If size parameter validation fails (e.g., empty string)
 	 */
-	sizeSelect(size: any): void {
+	sizeSelect(size: string): void {
 		try {
 			this.validateString(size, "size");
 
