@@ -55,8 +55,6 @@ export class ProductListingImpl extends BaseModule implements ProductListingMod 
 	 * @param {string} [listName] - The name of the product list (optional)
 	 *                              If not provided, the URL slug will be automatically used
 	 *
-	 * @returns {void}
-	 *
 	 * @example
 	 * // Basic usage with just products
 	 * const dl = getDataLayer();
@@ -77,7 +75,7 @@ export class ProductListingImpl extends BaseModule implements ProductListingMod 
 	 * // With custom list name
 	 * dl.plp.view(products, "Summer Collection");
 	 */
-	public view(productsArray: ProductData[], listName?: string): void {
+	view(productsArray: ProductData[], listName?: string): void {
 		try {
 			const list_name = listName || (typeof window !== "undefined" ? window.location.pathname.split("/").filter(Boolean).pop() : "");
 
@@ -119,8 +117,6 @@ export class ProductListingImpl extends BaseModule implements ProductListingMod 
 	 *
 	 * @param {ListFilters} list_filters - Object containing filter types and values
 	 *
-	 * @returns {void}
-	 *
 	 * @example
 	 * // Single filter type with a single value
 	 * const dl = getDataLayer();
@@ -144,7 +140,7 @@ export class ProductListingImpl extends BaseModule implements ProductListingMod 
 	 *   filter_value: "womens,sneakers,sale|50-100|red,blue"
 	 * });
 	 */
-	public filter(list_filters: ListFilters): void {
+	filter(list_filters: ListFilters): void {
 		try {
 			if (!list_filters) {
 				throw new Error(`list_filters is required.`, { cause: "REQUIRED_FIELD_MISSING" });
@@ -180,8 +176,6 @@ export class ProductListingImpl extends BaseModule implements ProductListingMod 
 	 *                          Examples include "price_descending", "price_ascending",
 	 *                          "newest", "bestselling", "relevance", etc.
 	 *
-	 * @returns {void}
-	 *
 	 * @example
 	 * // Track when a user sorts products by price (high to low)
 	 * const dl = getDataLayer();
@@ -192,7 +186,7 @@ export class ProductListingImpl extends BaseModule implements ProductListingMod 
 	 * // Track when a user sorts products by newest first
 	 * dl.plp.sort("newest");
 	 */
-	public sort(option: string): void {
+	sort(option: string): void {
 		try {
 			this.validateString(option, "option");
 
@@ -212,5 +206,5 @@ export class ProductListingImpl extends BaseModule implements ProductListingMod 
 		}
 	}
 
-	public click(): void {}
+	click(): void {}
 }

@@ -104,7 +104,7 @@ export class CartImpl extends BaseModule implements CartMod {
 	 * 
 	 * Used when a user removes an item from their cart entirely.
 	 * This event uses the current cart state that should have been previously 
-	 * initialized by a cart view event (miniView or fullView).
+	 * initialised by a cart view event (miniView or fullView).
 	 * 
 	 * @param {string} childSku - The SKU identifier of the cart item to remove
 	 * 
@@ -116,14 +116,14 @@ export class CartImpl extends BaseModule implements CartMod {
 	 * // Track when a user removes an item from their cart
 	 * const dl = getDataLayer();
 	 * 
-	 * // First, ensure cart state is initialized with miniView or fullView
+	 * // First, ensure cart state is initialised with miniView or fullView
 	 * // dl.cart.fullView(...);
 	 * 
 	 * // Then remove an item from the cart
 	 * dl.cart.remove("SKU123-M-BLU");
 	 * 
 	 * @remarks
-	 * This method depends on the cart state being initialized by calling either
+	 * This method depends on the cart state being initialised by calling either
 	 * miniView() or fullView() before using this method. It will log a warning and
 	 * do nothing if the specified item is not found in the current cart state.
 	 * 
@@ -176,7 +176,7 @@ export class CartImpl extends BaseModule implements CartMod {
 	 * 
 	 * Used when a user updates the quantity of an item in their cart.
 	 * This event uses the current cart state that should have been previously 
-	 * initialized by a cart view event (miniView or fullView).
+	 * initialised by a cart view event (miniView or fullView).
 	 * 
 	 * @param {string} childSku - The SKU identifier of the cart item to update
 	 * @param {number} quantity - The new quantity value for the cart item
@@ -190,14 +190,14 @@ export class CartImpl extends BaseModule implements CartMod {
 	 * // Track when a user updates the quantity of an item in their cart
 	 * const dl = getDataLayer();
 	 * 
-	 * // First, ensure cart state is initialized with miniView or fullView
+	 * // First, ensure cart state is initialised with miniView or fullView
 	 * // dl.cart.fullView(...);
 	 * 
 	 * // Then update an item's quantity
 	 * dl.cart.update("SKU123-M-BLU", 3);
 	 * 
 	 * @remarks
-	 * This method depends on the cart state being initialized by calling either
+	 * This method depends on the cart state being initialised by calling either
 	 * miniView() or fullView() before using this method. It will log a warning and
 	 * do nothing if the specified item is not found in the current cart state.
 	 */

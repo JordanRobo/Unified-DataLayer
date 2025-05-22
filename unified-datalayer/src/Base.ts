@@ -16,7 +16,7 @@ export abstract class BaseModule {
 	 * @param eventName The name of the event
 	 * @param eventData The data to include with the event
 	 */
-	public pushEvent(eventName: string, eventData: EventData = {}): Promise<void> {
+	pushEvent(eventName: string, eventData: EventData = {}): Promise<void> {
 		return this.dataLayer.pushEvent(eventName, eventData);
 	}
 

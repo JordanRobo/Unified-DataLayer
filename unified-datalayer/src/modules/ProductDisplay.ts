@@ -19,8 +19,6 @@ export class ProductDisplayImpl extends BaseModule implements ProductDisplayMod 
 	 * 
 	 * @param {ProductData} productData - The product data object for the viewed product
 	 * 
-	 * @returns {void}
-	 * 
 	 * @example
 	 * // Track when a user views a product detail page
 	 * const dl = getDataLayer();
@@ -68,8 +66,6 @@ export class ProductDisplayImpl extends BaseModule implements ProductDisplayMod 
 	 * 
 	 * @param {string} color - The selected color value
 	 * 
-	 * @returns {void}
-	 * 
 	 * @example
 	 * // Track when a user selects a color for a product
 	 * const dl = getDataLayer();
@@ -104,8 +100,6 @@ export class ProductDisplayImpl extends BaseModule implements ProductDisplayMod 
 	 * This event should be triggered each time the user changes the size selection.
 	 * 
 	 * @param {string} size - The selected size value
-	 * 
-	 * @returns {void}
 	 * 
 	 * @example
 	 * // Track when a user selects a size for a product

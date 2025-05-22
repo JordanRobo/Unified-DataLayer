@@ -16,7 +16,7 @@ export class PageImpl extends BaseModule implements PageMod {
 	/**
 	 * Track a home page view
 	 */
-	public home(): void {
+	home(): void {
 		this.pushEvent("page_default", {
 			default: {
 				page: {
@@ -35,7 +35,7 @@ export class PageImpl extends BaseModule implements PageMod {
 	 * @param pageType Type of page (e.g., "category", "search", "checkout")
 	 * @param action The action performed on the page (default: "view")
 	 */
-	public view(pageType: string, action: string = "view"): void {
+	view(pageType: string, action: string = "view"): void {
 		try {
 			this.validateString(pageType, "pageType");
 			this.validateString(action, "action");
@@ -59,7 +59,7 @@ export class PageImpl extends BaseModule implements PageMod {
 	/**
 	 * Track a page error
 	 */
-	public error(): void {
+	error(): void {
 		// Implementation for error tracking
 	}
 }

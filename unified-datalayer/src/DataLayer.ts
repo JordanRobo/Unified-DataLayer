@@ -83,7 +83,7 @@ class DataLayer {
 	 * 	}
 	 * });
 	 */
-	public init(options: DataLayerConfig): void {
+	init(options: DataLayerConfig): void {
 		if (!options.siteInfo) {
 			throw new Error("DataLayer initialisation failed: siteInfo is required");
 		}
@@ -107,7 +107,7 @@ class DataLayer {
 	 * @param eventData Object containing the event data
 	 * @throws Error if DataLayer has not been initialised with siteInfo
 	 */
-	public pushEvent(eventName: string, eventData: EventData = {}): Promise<void> {
+	pushEvent(eventName: string, eventData: EventData = {}): Promise<void> {
 		try {
 			this.validateInitialisation();
 
@@ -245,7 +245,7 @@ class DataLayer {
 	 * Reset the first event flag - useful for testing or when you need to force
 	 * the site information to be sent again
 	 */
-	public resetFirstEventFlag(): void {
+	resetFirstEventFlag(): void {
 		this.isFirstEventAfterRefresh = true;
 	}
 
@@ -253,7 +253,7 @@ class DataLayer {
 	 * Configure properties that should be automatically nullified
 	 * @param properties - Map of object keys to arrays of properties to nullify
 	 */
-	public setPropertiesToNullify(properties: Record<string, string[]>): void {
+	setPropertiesToNullify(properties: Record<string, string[]>): void {
 		this.propertiesToNullify = properties;
 	}
 
@@ -262,7 +262,7 @@ class DataLayer {
 	 * @param key - The object key (e.g., 'default')
 	 * @param properties - Array of property names to nullify
 	 */
-	public addPropertiesToNullify(key: string, properties: string[]): void {
+	addPropertiesToNullify(key: string, properties: string[]): void {
 		this.propertiesToNullify[key] = [...(this.propertiesToNullify[key] || []), ...properties];
 	}
 }
