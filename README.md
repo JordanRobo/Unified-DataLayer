@@ -4,6 +4,7 @@ A multi-framework utility package for managing XP Data Layer events across diffe
 
 [![npm version](https://img.shields.io/npm/v/unified-datalayer.svg)](https://www.npmjs.com/package/unified-datalayer)
 [![license](https://img.shields.io/npm/l/unified-datalayer.svg)](https://github.com/JordanRobo/Unified-DataLayer/blob/main/LICENSE)
+
 ## Overview
 
 Unified DataLayer provides a standardised way to interact with Adobe's Data Layer across different web frameworks. It offers module-based architecture for various tracking scenarios like page views, product displays, cart interactions, and more.
@@ -15,6 +16,8 @@ Unified DataLayer provides a standardised way to interact with Adobe's Data Laye
 - **Modular Design**: Separate modules for different tracking scenarios
 - **Smart Nullification**: Automatically handles data layer cleanup between events
 - **Standardised Formatting**: Ensures consistent data structure across all events
+- **Built-in Validation**: Comprehensive input validation with detailed error messages
+- **TypeScript Support**: Full TypeScript definitions included
 
 ## Installation
 
@@ -75,17 +78,13 @@ const product = {
   category: ['Footwear', 'Running'],
   child_sku: 'SKU12345',
   color: 'Blue',
-  discount: 0,
-  feature: ['waterproof', 'lightweight'],
   full_price: 150,
   gender: 'Men',
-  is_markdown: false,
   listed_price: 150,
-  model: 'Speed Runner',
   name: 'Speed Runner 2.0',
   parent_category: 'Footwear',
   parent_sku: 'PARENT-SKU',
-  rating: 4.5
+  sku_available: true
 };
 
 dataLayer.pdp.view(product);
@@ -101,15 +100,28 @@ dataLayer.pdp.sizeSelect('10');
 
 ```typescript
 // Track adding a product to cart
-dataLayer.cart.add(product);
+const cartProduct = {
+  ...product,
+  qty: 1,
+  size: '10',
+  sku_by_size: 'SKU12345-10'
+};
+
+dataLayer.cart.add(cartProduct);
 
 // Track cart view
 const cartItems = [
-  { ...product, qty: 1 },
-  { ...anotherProduct, qty: 2 }
+  { ...cartProduct, qty: 1 },
+  { ...anotherCartProduct, qty: 2 }
 ];
 
 dataLayer.cart.fullView(cartItems, { cartId: 'cart123' });
+
+// Track cart updates
+dataLayer.cart.update('SKU12345-10', 2);
+
+// Track cart item removal
+dataLayer.cart.remove('SKU12345-10');
 ```
 
 ## Available Modules
@@ -117,28 +129,31 @@ dataLayer.cart.fullView(cartItems, { cartId: 'cart123' });
 ### Page Module
 Handles tracking for general page views and navigation:
 - `home()`: Track home page view
-- `view(pageType, action)`: Track any page type view
+- `view(pageType, action?)`: Track any page type view
 - `error()`: Track page errors
 
 ### Product Display Module (PDP)
 Manages tracking for product detail pages:
 - `view(productData)`: Track product detail view
-- `colorSelect(colour)`: Track colour selection
+- `colorSelect(color)`: Track color selection
 - `sizeSelect(size)`: Track size selection
 
 ### Product Listing Module (PLP)
 Manages tracking for product listing pages:
-- `view(productsArray, listName)`: Track product listing view
-- `filter(filterOptions)`: Track filter usage
+- `view(productsArray, listName?)`: Track product listing view
+- `filter(listFilters)`: Track filter usage
 - `sort(option)`: Track sort option selection
+- `click()`: Track product click (placeholder)
 
 ### Cart Module
 Manages tracking for cart interactions:
 - `add(product)`: Track adding product to cart
-- `remove(removedProduct, remainingItems, cartInfo)`: Track removing product from cart
-- `update(items, cartInfo)`: Track cart update
+- `remove(childSku)`: Track removing product from cart
+- `update(childSku, quantity)`: Track updating cart item quantity
 - `miniView(items, cartInfo)`: Track mini cart view
 - `fullView(items, cartInfo)`: Track full cart view
+- `getCartItems()`: Get current cart items
+- `getCartInfo()`: Get current cart information
 
 ### Checkout Module
 Manages tracking for checkout process:
@@ -153,10 +168,60 @@ Manages tracking for user account actions:
 - `loginStart()`: Track login attempt
 - `loginSuccess()`: Track successful login
 
+### Order Module
+Manages tracking for order completion:
+- `success()`: Track successful order completion
+
 ### Wishlist Module
 Manages tracking for wishlist interactions:
 - `view()`: Track wishlist view
 - `add()`: Track adding item to wishlist
+
+## Data Types
+
+### ProductData Interface
+```typescript
+interface ProductData {
+  brand: string;
+  category: string[];
+  child_sku: string;
+  color: string;
+  full_price: number;
+  gender: string;
+  listed_price: number;
+  name: string;
+  parent_category: string;
+  parent_sku: string;
+  sku_available: boolean;
+  // Optional fields
+  available_size?: string[];
+  barcode?: string;
+  feature?: string[];
+  rating?: number;
+  reward_points?: number;
+  model?: string;
+  speciality?: string;
+  sport?: string;
+  story?: string;
+}
+```
+
+### CartProductData Interface
+```typescript
+interface CartProductData extends ProductData {
+  qty: number;
+  size: string;
+  sku_by_size: string;
+}
+```
+
+### ListFilters Interface
+```typescript
+interface ListFilters {
+  filter_type: string;  // Pipe-separated: "category|price|color"
+  filter_value: string; // Corresponding values: "sneakers|50-100|red,blue"
+}
+```
 
 ## Advanced Configuration
 
@@ -173,6 +238,73 @@ dataLayer.setPropertiesToNullify({
 
 // Add properties to nullify 
 dataLayer.addPropertiesToNullify('default', ['search']);
+```
+
+### Error Handling
+
+The library includes comprehensive error handling with detailed error messages. 
+
+All errors are logged to the console and requires no implementation, this is all handled internally.
+
+
+### State Management
+
+Access current cart state:
+
+```typescript
+// Get current cart items
+const currentItems = dataLayer.cart.getCartItems();
+
+// Get current cart info
+const cartInfo = dataLayer.cart.getCartInfo();
+```
+
+## Event Examples
+
+### Product Listing with Filters
+```typescript
+// Track product listing view
+const products = [
+  {
+    brand: 'Nike',
+    category: ['Footwear', 'Running'],
+    child_sku: 'NIKE-RUN-001',
+    color: 'Black',
+    full_price: 120.00,
+    gender: 'Men',
+    listed_price: 99.99,
+    name: 'Air Max Runner',
+    parent_category: 'Footwear',
+    parent_sku: 'NIKE-RUN',
+    sku_available: true
+  }
+];
+
+dataLayer.plp.view(products, 'Running Shoes');
+
+// Track filter application
+dataLayer.plp.filter({
+  filter_type: 'category|price|color',
+  filter_value: 'running|50-150|black,white'
+});
+
+// Track sorting
+dataLayer.plp.sort('price_ascending');
+```
+
+### Account Creation Flow
+```typescript
+// Track account creation start
+dataLayer.account.createStart();
+
+// After successful registration
+dataLayer.account.createComplete();
+
+// Track login attempts
+dataLayer.account.loginStart();
+
+// After successful login
+dataLayer.account.loginSuccess();
 ```
 
 ## Development
@@ -206,15 +338,32 @@ bun run dev
 
 # Run tests
 bun run test
+
+# Build and prepare for publishing
+bun run prepare
 ```
+
+### Testing
+
+The package includes a comprehensive test suite with an interactive HTML test page:
+
+```bash
+# Open test/index.html in a browser to test all functionality
+# The test page includes:
+# - All module testing
+# - Error handling validation
+# - Real-time data layer state inspection
+# - Console output monitoring
+```
+
+## Browser Compatibility
+
+- Modern browsers with ES6+ support
+- Adobe Client Data Layer integration
 
 ## License
 
 This project is licensed under the BSD 3-Clause License - see the LICENSE file for details.
-
-## Thanks
-
-Example site cloned from https://github.com/SwiftMarket/swiftmarket-sveltekit.git 
 
 ## Contributing
 
@@ -225,3 +374,7 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 3. Commit your changes (`git commit -m 'Add some amazing feature'`)
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
+
+## Thanks
+
+Example site cloned from https://github.com/SwiftMarket/swiftmarket-sveltekit.git
