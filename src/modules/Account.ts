@@ -1,20 +1,11 @@
 import { BaseModule } from "../Base";
 
 export interface AccountMod {
-	createStart(): void;
-	createComplete(): void;
-	loginStart(): void;
-	loginSuccess(): void;
-}
-
-export class AccountImpl extends BaseModule implements AccountMod {
 	/**
 	 * Push an 'account_create-start' event to the datalayer
 	 * 
 	 * Used when a user initiates the account creation process. This event should be
 	 * triggered when the user first accesses or opens the account registration form.
-	 * 
-	 * @returns {void}
 	 * 
 	 * @example
 	 * // Track when a user starts the account creation process
@@ -30,24 +21,7 @@ export class AccountImpl extends BaseModule implements AccountMod {
 	 *   }
 	 * }, [isRegistrationFormVisible]);
 	 */
-	createStart(): void {
-		try {
-			this.pushEvent("account_create-start", {
-				default: {
-					page: {
-						type: "account",
-						action: "create-start",
-					},
-				},
-				form_info: {
-					name: "create-account",
-					type: "registration"
-				}
-			});
-		} catch (error: any) {
-			console.error(`[unified-datalayer] ${error.cause}: ${error.message}`);
-		}
-	}
+	createStart(): void;
 
 	/**
 	* Push an 'account_create-complete' event to the datalayer
@@ -55,8 +29,6 @@ export class AccountImpl extends BaseModule implements AccountMod {
 	* Used when a user successfully completes the account creation process. This event
 	* should be triggered after the registration form has been submitted and the account
 	* has been successfully created.
-	* 
-	* @returns {void}
 	* 
 	* @example
 	* // Track when a user successfully creates an account
@@ -83,26 +55,7 @@ export class AccountImpl extends BaseModule implements AccountMod {
 	*   }
 	* };
 	*/
-	createComplete(): void {
-		try {
-			this.pushEvent("account_create-complete", {
-				default: {
-					page: {
-						type: "account",
-						action: "create-complete",
-					},
-				},
-				form_info: {
-					name: "create-account",
-					type: "registration",
-					nl_subscription: true,
-					loyalty_subscription: true
-				},
-			});
-		} catch (error: any) {
-			console.error(`[unified-datalayer] ${error.cause}: ${error.message}`);
-		}
-	}
+	createComplete(): void;
 
 	/**
 	* Push an 'account_login-start' event to the datalayer
@@ -110,8 +63,6 @@ export class AccountImpl extends BaseModule implements AccountMod {
 	* Used when a user initiates the login process. This event should be triggered
 	* when the user first accesses or opens the login form, indicating the start
 	* of the authentication flow.
-	* 
-	* @returns {void}
 	* 
 	* @example
 	* // Track when a user starts the login process
@@ -137,24 +88,7 @@ export class AccountImpl extends BaseModule implements AccountMod {
 	*   return <LoginForm />;
 	* };
 	*/
-	loginStart(): void {
-		try {
-			this.pushEvent("account_login-start", {
-				default: {
-					page: {
-						type: "account",
-						action: "login-start",
-					},
-				},
-				form_info: {
-					name: "account-login",
-					type: "login",
-				},
-			});
-		} catch (error: any) {
-			console.error(`[unified-datalayer] ${error.cause}: ${error.message}`);
-		}
-	}
+	loginStart(): void;
 
 	/**
 	* Push an 'account_login-success' event to the datalayer
@@ -162,8 +96,6 @@ export class AccountImpl extends BaseModule implements AccountMod {
 	* Used when a user successfully completes the login process. This event should be
 	* triggered after the login form has been submitted and the user has been
 	* successfully authenticated.
-	* 
-	* @returns {void}
 	* 
 	* @example
 	* // Track when a user successfully logs in
@@ -190,6 +122,70 @@ export class AccountImpl extends BaseModule implements AccountMod {
 	*   }
 	* };
 	*/
+	loginSuccess(): void;
+}
+
+export class AccountImpl extends BaseModule implements AccountMod {
+
+	createStart(): void {
+		try {
+			this.pushEvent("account_create-start", {
+				default: {
+					page: {
+						type: "account",
+						action: "create-start",
+					},
+				},
+				form_info: {
+					name: "create-account",
+					type: "registration"
+				}
+			});
+		} catch (error: any) {
+			console.error(`[unified-datalayer] ${error.cause}: ${error.message}`);
+		}
+	}
+
+	createComplete(): void {
+		try {
+			this.pushEvent("account_create-complete", {
+				default: {
+					page: {
+						type: "account",
+						action: "create-complete",
+					},
+				},
+				form_info: {
+					name: "create-account",
+					type: "registration",
+					nl_subscription: true,
+					loyalty_subscription: true
+				},
+			});
+		} catch (error: any) {
+			console.error(`[unified-datalayer] ${error.cause}: ${error.message}`);
+		}
+	}
+
+	loginStart(): void {
+		try {
+			this.pushEvent("account_login-start", {
+				default: {
+					page: {
+						type: "account",
+						action: "login-start",
+					},
+				},
+				form_info: {
+					name: "account-login",
+					type: "login",
+				},
+			});
+		} catch (error: any) {
+			console.error(`[unified-datalayer] ${error.cause}: ${error.message}`);
+		}
+	}
+
 	loginSuccess(): void {
 		try {
 			this.pushEvent("account_login-success", {

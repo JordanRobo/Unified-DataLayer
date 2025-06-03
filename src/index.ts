@@ -1,5 +1,5 @@
 import DataLayer, { getDataLayer } from "./DataLayer";
-import type { DataLayerConfig } from "./types";
+import type { DataLayerConfig, Product, CartProductData } from "./types";
 
 if (typeof window !== 'undefined') {
     window.addEventListener('unhandledrejection', function (event) {
@@ -8,4 +8,4 @@ if (typeof window !== 'undefined') {
 }
 
 export { DataLayer, getDataLayer };
-export type { DataLayerConfig };
+export type { DataLayerConfig, Product, CartProductData };

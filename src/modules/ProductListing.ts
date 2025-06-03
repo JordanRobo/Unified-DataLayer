@@ -2,8 +2,93 @@ import { BaseModule } from "../Base";
 import { ProductData, BaseProduct } from "../types";
 
 export interface ProductListingMod {
+	/**
+	 * Push a 'product_listing-view' event to the datalayer
+	 *
+	 * Used when a user navigates to any page containing a list of products/items.
+	 * This event should be triggered once when the product listing page initially loads.
+	 *
+	 * @param {ProductData[]} productsArray - An array of products displayed on the page
+	 * @param {string} [listName] - The name of the product list (optional)
+	 *                              If not provided, the URL slug will be automatically used
+	 *
+	 * @example
+	 * // Basic usage with just products
+	 * const dl = getDataLayer();
+	 *
+	 * const products = [
+	 *   {
+	 *     item_id: "SKU123",
+	 *     item_name: "Premium T-Shirt",
+	 *     price: 29.99,
+	 *     // other product properties...
+	 *   },
+	 *   // additional products...
+	 * ];
+	 *
+	 * dl.plp.view(products);
+	 *
+	 * @example
+	 * // With custom list name
+	 * dl.plp.view(products, "Summer Collection");
+	 */
 	view(productsArray: ProductData[], listName?: string): void;
+
+	/**
+	 * Push a 'product_listing-filters' event to the datalayer
+	 *
+	 * Used whenever a user applies filters to a product listing, such as price ranges,
+	 * categories, colors, sizes, etc. This should be triggered each time filters are
+	 * modified by the user.
+	 *
+	 * @param {ListFilters} list_filters - Object containing filter types and values
+	 *
+	 * @example
+	 * // Single filter type with a single value
+	 * const dl = getDataLayer();
+	 *
+	 * dl.plp.filters({
+	 *   filter_type: "category",
+	 *   filter_value: "sneakers"
+	 * });
+	 *
+	 * @example
+	 * // Multiple filter types with single values
+	 * dl.plp.filters({
+	 *   filter_type: "category|price",
+	 *   filter_value: "sneakers|50-100"
+	 * });
+	 *
+	 * @example
+	 * // Multiple filter types with multiple values for some types
+	 * dl.plp.filters({
+	 *   filter_type: "category|price|color",
+	 *   filter_value: "womens,sneakers,sale|50-100|red,blue"
+	 * });
+	 */
 	filter(list_filters: ListFilters): void;
+
+	/**
+	 * Push a 'product_listing-sort' event to the datalayer
+	 *
+	 * Used when a user changes the sort order of products in a listing page.
+	 * This event should be triggered whenever the user selects a different
+	 * sorting option from a dropdown or other sorting control.
+	 *
+	 * @param {string} option - The sort option selected by the user
+	 *                          Examples include "price_descending", "price_ascending",
+	 *                          "newest", "bestselling", "relevance", etc.
+	 *
+	 * @example
+	 * // Track when a user sorts products by price (high to low)
+	 * const dl = getDataLayer();
+	 *
+	 * dl.plp.sort("price_descending");
+	 *
+	 * @example
+	 * // Track when a user sorts products by newest first
+	 * dl.plp.sort("newest");
+	 */
 	sort(option: string): void;
 	click(): void;
 }
@@ -45,36 +130,7 @@ interface PLP_Product extends BaseProduct {
 }
 
 export class ProductListingImpl extends BaseModule implements ProductListingMod {
-	/**
-	 * Push a 'product_listing-view' event to the datalayer
-	 *
-	 * Used when a user navigates to any page containing a list of products/items.
-	 * This event should be triggered once when the product listing page initially loads.
-	 *
-	 * @param {ProductData[]} productsArray - An array of products displayed on the page
-	 * @param {string} [listName] - The name of the product list (optional)
-	 *                              If not provided, the URL slug will be automatically used
-	 *
-	 * @example
-	 * // Basic usage with just products
-	 * const dl = getDataLayer();
-	 *
-	 * const products = [
-	 *   {
-	 *     item_id: "SKU123",
-	 *     item_name: "Premium T-Shirt",
-	 *     price: 29.99,
-	 *     // other product properties...
-	 *   },
-	 *   // additional products...
-	 * ];
-	 *
-	 * dl.plp.view(products);
-	 *
-	 * @example
-	 * // With custom list name
-	 * dl.plp.view(products, "Summer Collection");
-	 */
+
 	view(productsArray: ProductData[], listName?: string): void {
 		try {
 			const list_name = listName || (typeof window !== "undefined" ? window.location.pathname.split("/").filter(Boolean).pop() : "");
@@ -108,38 +164,6 @@ export class ProductListingImpl extends BaseModule implements ProductListingMod 
 		}
 	}
 
-	/**
-	 * Push a 'product_listing-filters' event to the datalayer
-	 *
-	 * Used whenever a user applies filters to a product listing, such as price ranges,
-	 * categories, colors, sizes, etc. This should be triggered each time filters are
-	 * modified by the user.
-	 *
-	 * @param {ListFilters} list_filters - Object containing filter types and values
-	 *
-	 * @example
-	 * // Single filter type with a single value
-	 * const dl = getDataLayer();
-	 *
-	 * dl.plp.filters({
-	 *   filter_type: "category",
-	 *   filter_value: "sneakers"
-	 * });
-	 *
-	 * @example
-	 * // Multiple filter types with single values
-	 * dl.plp.filters({
-	 *   filter_type: "category|price",
-	 *   filter_value: "sneakers|50-100"
-	 * });
-	 *
-	 * @example
-	 * // Multiple filter types with multiple values for some types
-	 * dl.plp.filters({
-	 *   filter_type: "category|price|color",
-	 *   filter_value: "womens,sneakers,sale|50-100|red,blue"
-	 * });
-	 */
 	filter(list_filters: ListFilters): void {
 		try {
 			if (!list_filters) {
@@ -165,27 +189,6 @@ export class ProductListingImpl extends BaseModule implements ProductListingMod 
 		}
 	}
 
-	/**
-	 * Push a 'product_listing-sort' event to the datalayer
-	 *
-	 * Used when a user changes the sort order of products in a listing page.
-	 * This event should be triggered whenever the user selects a different
-	 * sorting option from a dropdown or other sorting control.
-	 *
-	 * @param {string} option - The sort option selected by the user
-	 *                          Examples include "price_descending", "price_ascending",
-	 *                          "newest", "bestselling", "relevance", etc.
-	 *
-	 * @example
-	 * // Track when a user sorts products by price (high to low)
-	 * const dl = getDataLayer();
-	 *
-	 * dl.plp.sort("price_descending");
-	 *
-	 * @example
-	 * // Track when a user sorts products by newest first
-	 * dl.plp.sort("newest");
-	 */
 	sort(option: string): void {
 		try {
 			this.validateString(option, "option");

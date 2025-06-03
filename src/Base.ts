@@ -71,7 +71,7 @@ export abstract class BaseModule {
 		if (product.rating) formattedProduct.rating = product.rating;
 		if (product.reward_points) formattedProduct.reward_points = product.reward_points;
 		if (product.model) formattedProduct.model = this.formatString(product.model);
-		if (product.speciality) formattedProduct.speciality = this.formatString(product.speciality);
+		if (product.specialty) formattedProduct.specialty = this.formatString(product.specialty);
 		if (product.sport) formattedProduct.sport = this.formatString(product.sport);
 		if (product.story) formattedProduct.story = this.formatString(product.story);
 
@@ -104,7 +104,7 @@ export abstract class BaseModule {
 		if (product.rating) formattedItem.rating = product.rating;
 		if (product.reward_points) formattedItem.reward_points = product.reward_points;
 		if (product.model) formattedItem.model = this.formatString(product.model);
-		if (product.speciality) formattedItem.speciality = this.formatString(product.speciality);
+		if (product.specialty) formattedItem.specialty = this.formatString(product.specialty);
 		if (product.sport) formattedItem.sport = this.formatString(product.sport);
 		if (product.story) formattedItem.story = this.formatString(product.story);
 

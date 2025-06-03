@@ -4,8 +4,21 @@ import { BaseModule } from "../Base";
  * Page module interface for tracking page-related events
  */
 export interface PageMod {
+	/**
+	 * Track a home page view
+	 */
 	home(): void;
+
+	/**
+	 * Track a page view for any page type
+	 * @param pageType Type of page (e.g., "category", "search", "checkout")
+	 * @param action The action performed on the page (default: "view")
+	 */
 	view(pageType: string, action?: string): void;
+
+	/**
+	 * Track a page error
+	 */
 	error(): void;
 }
 
@@ -13,9 +26,6 @@ export interface PageMod {
  * Implementation of the Page Module interface
  */
 export class PageImpl extends BaseModule implements PageMod {
-	/**
-	 * Track a home page view
-	 */
 	home(): void {
 		this.pushEvent("page_default", {
 			default: {
@@ -30,11 +40,6 @@ export class PageImpl extends BaseModule implements PageMod {
 		});
 	}
 
-	/**
-	 * Track a page view for any page type
-	 * @param pageType Type of page (e.g., "category", "search", "checkout")
-	 * @param action The action performed on the page (default: "view")
-	 */
 	view(pageType: string, action: string = "view"): void {
 		try {
 			this.validateString(pageType, "pageType");
@@ -56,9 +61,6 @@ export class PageImpl extends BaseModule implements PageMod {
 		}
 	}
 
-	/**
-	 * Track a page error
-	 */
 	error(): void {
 		// Implementation for error tracking
 	}

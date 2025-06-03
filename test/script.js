@@ -1,4 +1,4 @@
-import { getDataLayer } from "../dist";
+import { getDataLayer } from "../unified-datalayer/dist";
 import data from "./product_data.json";
 
 const dataLayer = getDataLayer();

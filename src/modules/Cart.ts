@@ -2,10 +2,167 @@ import { BaseModule } from "../Base";
 import { CartProductData } from "../types";
 
 export interface CartMod {
+	/**
+	 * Push a 'cart_add' event to the datalayer
+	 * 
+	 * Used when a user adds a product to their shopping cart.
+	 * 
+	 * @param {CartProductData} product - The product data to add to the cart
+	 * 
+	 * @example
+	 * // Add a product to the cart
+	 * const dl = getDataLayer();
+	 * 
+	 * dl.cart.add({
+	 *   item_id: "SKU123",
+	 *   item_name: "Premium T-Shirt",
+	 *   price: 29.99,
+	 *   qty: 1,
+	 *   child_sku: "SKU123-M-BLU"
+	 *   // other product properties...
+	 * });
+	 * 
+	 * @throws {Error} Will throw an error if the product data validation fails
+	 */
 	add(product: CartProductData): void;
+
+	/**
+	 * Push a 'cart_remove' event to the datalayer
+	 * 
+	 * Used when a user removes an item from their cart entirely.
+	 * This event uses the current cart state that should have been previously 
+	 * initialised by a cart view event (miniView or fullView).
+	 * 
+	 * @param {string} childSku - The SKU identifier of the cart item to remove
+	 * 
+	 * @example
+	 * // Track when a user removes an item from their cart
+	 * const dl = getDataLayer();
+	 * 
+	 * // First, ensure cart state is initialised with miniView or fullView
+	 * // dl.cart.fullView(...);
+	 * 
+	 * // Then remove an item from the cart
+	 * dl.cart.remove("SKU123-M-BLU");
+	 * 
+	 * @throws {Error} Will throw an error if childSku is not a valid string
+	 * 
+	 * @remarks
+	 * This method depends on the cart state being initialised by calling either
+	 * miniView() or fullView() before using this method. It will log a warning and
+	 * do nothing if the specified item is not found in the current cart state.
+	 * 
+	 * The event tracks both the removed item specifically and the updated cart state
+	 * after removal to provide comprehensive analytics data.
+	 */
 	remove(childSku: string): void;
+
+	/**
+	 * Push a 'cart_update' event to the datalayer
+	 * 
+	 * Used when a user updates the quantity of an item in their cart.
+	 * This event uses the current cart state that should have been previously 
+	 * initialised by a cart view event (miniView or fullView).
+	 * 
+	 * @param {string} childSku - The SKU identifier of the cart item to update
+	 * @param {number} quantity - The new quantity value for the cart item
+	 * 
+	 * 
+	 * @example
+	 * // Track when a user updates the quantity of an item in their cart
+	 * const dl = getDataLayer();
+	 * 
+	 * // First, ensure cart state is initialised with miniView or fullView
+	 * // dl.cart.fullView(...);
+	 * 
+	 * // Then update an item's quantity
+	 * dl.cart.update("SKU123-M-BLU", 3);
+	 * 
+	 * @throws {Error} Will throw an error if childSku is not a valid string
+	 * @throws {Error} Will throw an error if quantity is not a valid number
+	 * 
+	 * @remarks
+	 * This method depends on the cart state being initialised by calling either
+	 * miniView() or fullView() before using this method. It will log a warning and
+	 * do nothing if the specified item is not found in the current cart state.
+	 */
 	update(childSku: string, quantity: number): void;
+
+	/**
+	 * Push a 'cart_view-mini' event to the datalayer
+	 * 
+	 * Used when a user views their mini cart, typically shown as a dropdown or slide-out panel
+	 * without navigating to the full cart page. This event synchronizes the cart state and 
+	 * validates all cart items.
+	 * 
+	 * @param {CartProductData[]} items - Array of products currently in the cart
+	 * @param {CartInput} cartInput - Object containing either cartId or quoteId to identify the cart
+	 * 
+	 * @example
+	 * // Track when a user views their mini cart
+	 * const dl = getDataLayer();
+	 * 
+	 * const cartItems = [
+	 *   {
+	 *     item_id: "SKU123",
+	 *     item_name: "Premium T-Shirt",
+	 *     price: 29.99,
+	 *     qty: 2,
+	 *     child_sku: "SKU123-M-BLU"
+	 *     // other product properties...
+	 *   },
+	 *   // additional cart items...
+	 * ];
+	 * 
+	 * dl.cart.miniView(cartItems, { cartId: "cart_12345" });
+	 * 
+	 * @example
+	 * // Alternative using quoteId instead of cartId
+	 * dl.cart.miniView(cartItems, { quoteId: "quote_67890" });
+	 * 
+	 * @throws {Error} Will throw an error if items parameter is missing
+	 * @throws {Error} Will throw an error if neither cartId nor quoteId is provided
+	 * @throws {Error} Will throw an error if cartId or quoteId is not a valid string
+	 * @throws {Error} Will throw an error if any product data validation fails
+	 */
 	miniView(items: CartProductData[], cartInput: CartInput): void;
+
+	/**
+	 * Push a 'cart_view-full' event to the datalayer
+	 * 
+	 * Used when a user navigates to the full cart page to view their shopping cart.
+	 * This event synchronizes the cart state and validates all cart items.
+	 * 
+	 * @param {CartProductData[]} items - Array of products currently in the cart
+	 * @param {CartInput} cartInput - Object containing either cartId or quoteId to identify the cart
+	 * 
+	 * @example
+	 * // Track when a user views the full cart page
+	 * const dl = getDataLayer();
+	 * 
+	 * const cartItems = [
+	 *   {
+	 *     item_id: "SKU123",
+	 *     item_name: "Premium T-Shirt",
+	 *     price: 29.99,
+	 *     qty: 2,
+	 *     child_sku: "SKU123-M-BLU"
+	 *     // other product properties...
+	 *   },
+	 *   // additional cart items...
+	 * ];
+	 * 
+	 * dl.cart.fullView(cartItems, { cartId: "cart_12345" });
+	 * 
+	 * @example
+	 * // Alternative using quoteId instead of cartId
+	 * dl.cart.fullView(cartItems, { quoteId: "quote_67890" });
+	 * 
+	 * @throws {Error} Will throw an error if items parameter is missing
+	 * @throws {Error} Will throw an error if neither cartId nor quoteId is provided
+	 * @throws {Error} Will throw an error if cartId or quoteId is not a valid string
+	 * @throws {Error} Will throw an error if any product data validation fails
+	 */
 	fullView(items: CartProductData[], cartInput: CartInput): void;
 
 	getCartItems(): CartProductData[];
@@ -41,30 +198,6 @@ export class CartImpl extends BaseModule implements CartMod {
 		};
 	}
 
-	/**
-	 * Push a 'cart_add' event to the datalayer
-	 * 
-	 * Used when a user adds a product to their shopping cart.
-	 * 
-	 * @param {CartProductData} product - The product data to add to the cart
-	 * 
-	 * @returns {void}
-	 * 
-	 * @throws {Error} Will throw an error if the product data validation fails
-	 * 
-	 * @example
-	 * // Add a product to the cart
-	 * const dl = getDataLayer();
-	 * 
-	 * dl.cart.add({
-	 *   item_id: "SKU123",
-	 *   item_name: "Premium T-Shirt",
-	 *   price: 29.99,
-	 *   qty: 1,
-	 *   child_sku: "SKU123-M-BLU"
-	 *   // other product properties...
-	 * });
-	 */
 	add(product: CartProductData): void {
 		try {
 			this.validateCartProductData(product);
@@ -99,37 +232,6 @@ export class CartImpl extends BaseModule implements CartMod {
 		}
 	}
 
-	/**
-	 * Push a 'cart_remove' event to the datalayer
-	 * 
-	 * Used when a user removes an item from their cart entirely.
-	 * This event uses the current cart state that should have been previously 
-	 * initialised by a cart view event (miniView or fullView).
-	 * 
-	 * @param {string} childSku - The SKU identifier of the cart item to remove
-	 * 
-	 * @returns {void}
-	 * 
-	 * @throws {Error} Will throw an error if childSku is not a valid string
-	 * 
-	 * @example
-	 * // Track when a user removes an item from their cart
-	 * const dl = getDataLayer();
-	 * 
-	 * // First, ensure cart state is initialised with miniView or fullView
-	 * // dl.cart.fullView(...);
-	 * 
-	 * // Then remove an item from the cart
-	 * dl.cart.remove("SKU123-M-BLU");
-	 * 
-	 * @remarks
-	 * This method depends on the cart state being initialised by calling either
-	 * miniView() or fullView() before using this method. It will log a warning and
-	 * do nothing if the specified item is not found in the current cart state.
-	 * 
-	 * The event tracks both the removed item specifically and the updated cart state
-	 * after removal to provide comprehensive analytics data.
-	 */
 	remove(childSku: string): void {
 		try {
 			this.validateString(childSku, "childSku");
@@ -171,36 +273,6 @@ export class CartImpl extends BaseModule implements CartMod {
 		}
 	}
 
-	/**
-	 * Push a 'cart_update' event to the datalayer
-	 * 
-	 * Used when a user updates the quantity of an item in their cart.
-	 * This event uses the current cart state that should have been previously 
-	 * initialised by a cart view event (miniView or fullView).
-	 * 
-	 * @param {string} childSku - The SKU identifier of the cart item to update
-	 * @param {number} quantity - The new quantity value for the cart item
-	 * 
-	 * @returns {void}
-	 * 
-	 * @throws {Error} Will throw an error if childSku is not a valid string
-	 * @throws {Error} Will throw an error if quantity is not a valid number
-	 * 
-	 * @example
-	 * // Track when a user updates the quantity of an item in their cart
-	 * const dl = getDataLayer();
-	 * 
-	 * // First, ensure cart state is initialised with miniView or fullView
-	 * // dl.cart.fullView(...);
-	 * 
-	 * // Then update an item's quantity
-	 * dl.cart.update("SKU123-M-BLU", 3);
-	 * 
-	 * @remarks
-	 * This method depends on the cart state being initialised by calling either
-	 * miniView() or fullView() before using this method. It will log a warning and
-	 * do nothing if the specified item is not found in the current cart state.
-	 */
 	update(childSku: string, quantity: number): void {
 		try {
 			this.validateMultiple([
@@ -249,45 +321,6 @@ export class CartImpl extends BaseModule implements CartMod {
 		}
 	}
 
-	/**
-	 * Push a 'cart_view-mini' event to the datalayer
-	 * 
-	 * Used when a user views their mini cart, typically shown as a dropdown or slide-out panel
-	 * without navigating to the full cart page. This event synchronizes the cart state and 
-	 * validates all cart items.
-	 * 
-	 * @param {CartProductData[]} items - Array of products currently in the cart
-	 * @param {CartInput} cartInput - Object containing either cartId or quoteId to identify the cart
-	 * 
-	 * @returns {void}
-	 * 
-	 * @throws {Error} Will throw an error if items parameter is missing
-	 * @throws {Error} Will throw an error if neither cartId nor quoteId is provided
-	 * @throws {Error} Will throw an error if cartId or quoteId is not a valid string
-	 * @throws {Error} Will throw an error if any product data validation fails
-	 * 
-	 * @example
-	 * // Track when a user views their mini cart
-	 * const dl = getDataLayer();
-	 * 
-	 * const cartItems = [
-	 *   {
-	 *     item_id: "SKU123",
-	 *     item_name: "Premium T-Shirt",
-	 *     price: 29.99,
-	 *     qty: 2,
-	 *     child_sku: "SKU123-M-BLU"
-	 *     // other product properties...
-	 *   },
-	 *   // additional cart items...
-	 * ];
-	 * 
-	 * dl.cart.miniView(cartItems, { cartId: "cart_12345" });
-	 * 
-	 * @example
-	 * // Alternative using quoteId instead of cartId
-	 * dl.cart.miniView(cartItems, { quoteId: "quote_67890" });
-	 */
 	miniView(items: CartProductData[], cartInput: CartInput): void {
 		try {
 			if (!items) {
@@ -326,44 +359,6 @@ export class CartImpl extends BaseModule implements CartMod {
 		}
 	}
 
-	/**
-	 * Push a 'cart_view-full' event to the datalayer
-	 * 
-	 * Used when a user navigates to the full cart page to view their shopping cart.
-	 * This event synchronizes the cart state and validates all cart items.
-	 * 
-	 * @param {CartProductData[]} items - Array of products currently in the cart
-	 * @param {CartInput} cartInput - Object containing either cartId or quoteId to identify the cart
-	 * 
-	 * @returns {void}
-	 * 
-	 * @throws {Error} Will throw an error if items parameter is missing
-	 * @throws {Error} Will throw an error if neither cartId nor quoteId is provided
-	 * @throws {Error} Will throw an error if cartId or quoteId is not a valid string
-	 * @throws {Error} Will throw an error if any product data validation fails
-	 * 
-	 * @example
-	 * // Track when a user views the full cart page
-	 * const dl = getDataLayer();
-	 * 
-	 * const cartItems = [
-	 *   {
-	 *     item_id: "SKU123",
-	 *     item_name: "Premium T-Shirt",
-	 *     price: 29.99,
-	 *     qty: 2,
-	 *     child_sku: "SKU123-M-BLU"
-	 *     // other product properties...
-	 *   },
-	 *   // additional cart items...
-	 * ];
-	 * 
-	 * dl.cart.fullView(cartItems, { cartId: "cart_12345" });
-	 * 
-	 * @example
-	 * // Alternative using quoteId instead of cartId
-	 * dl.cart.fullView(cartItems, { quoteId: "quote_67890" });
-	 */
 	fullView(items: CartProductData[], cartInput: CartInput): void {
 		try {
 			if (!items) {
